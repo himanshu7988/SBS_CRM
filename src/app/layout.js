@@ -1,4 +1,5 @@
 import "./globals.css";
+import "@/css/table.css";
 import Provider from "@/app/Provider";
 import { Poppins } from '@next/font/google';
 

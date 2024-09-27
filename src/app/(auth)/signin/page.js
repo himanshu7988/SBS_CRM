@@ -3,6 +3,7 @@ import { SigninSchema } from "@/models/ValidationSchemas";
 import { Button } from "@nextui-org/react";
 import { useFormik } from "formik";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { ImEyeBlocked } from "react-icons/im";
 import { ImEye } from "react-icons/im";
@@ -15,11 +16,14 @@ const initialValues = {
 const Signin = () => {
   const [show, setShow] = useState(false);
 
+  const router = useRouter();
+
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: SigninSchema,
     onSubmit: async (values) => {
       console.log(values);
+      router.push("/dashboard");
     },
   });
 
@@ -65,7 +69,7 @@ const Signin = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
-                  
+
                   {show ? (
                     <button
                       type="button"
@@ -84,16 +88,15 @@ const Signin = () => {
                         setShow(true);
                       }}
                     >
-                      <ImEyeBlocked className="text-2xl"/>
+                      <ImEyeBlocked className="text-2xl" />
                     </button>
                   )}
-                  
                 </div>
                 <p className="me-1 text-xs text-red-500 text-end">
-                    {formik.touched.password && formik.errors.password
-                      ? formik.errors.password
-                      : ""}
-                  </p>
+                  {formik.touched.password && formik.errors.password
+                    ? formik.errors.password
+                    : ""}
+                </p>
               </div>
               <div className="flex flex-col items-center mt-8 gap-4">
                 <Button
