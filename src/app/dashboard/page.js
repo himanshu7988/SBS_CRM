@@ -3,7 +3,7 @@ import Chart from "@/components/Chart"
 
 const page = () => {
   return (
-    <section>
+    <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
         <div className="p-8 rounded-lg bg-default flex flex-col gap-2 text-white">
           <p className="text-3xl font-light">Total Contacts</p>
@@ -21,7 +21,7 @@ const page = () => {
       <div className="mt-12">
         <Chart/>
       </div>
-    </section>
+    </>
   );
 };
 

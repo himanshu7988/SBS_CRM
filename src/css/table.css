@@ -13,6 +13,7 @@ th:nth-last-child(1) {
   border-right: 1px solid black !important;
   border-collapse: collapse;
 }
+
 th:nth-child(1) {
   border-left: 1px solid black !important;
   border-collapse: collapse;
@@ -24,8 +25,11 @@ th {
   font-weight: 300;
 }
 
-tr:nth-child(even) {
+tbody tr:nth-child(even) {
   background-color: #e5cffc;
+}
+tbody tr:nth-child(odd) {
+  background-color: white;
 }
 
 thead {
@@ -33,10 +37,10 @@ thead {
   color: white;
 }
 
-tr:nth-child(even):hover {
-  background-color: white;
+tbody tr:hover {
+  background-color: rgba(229 207 252/0.1);
 }
 
-tr:nth-child(odd):hover {
+/* tbody :nth-child(odd):hover {
   background-color: white;
-}
+} */

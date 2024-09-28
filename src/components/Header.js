@@ -1,12 +1,16 @@
-import Image from "next/image";
 import React from "react";
 import { IoIosSearch } from "react-icons/io";
+import Profile from "@/components/modals/Profile";
+import { RxHamburgerMenu } from "react-icons/rx";
 
-const Header = () => {
+const Header = ({ sidebarOpen, setSidebarOpen }) => {
   return (
-    <header className="h-24 flex items-center md:px-8 px-4">
-      <div className="flex items-center justify-between w-full">
-        <div className="relative">
+    <header className="h-20 md:h-24 flex items-center md:px-8 px-4 md:shadow-none shadow-md">
+      <div className="flex items-center justify-between flex-row-reverse md:flex-row w-full">
+        <div className="md:hidden block" onClick={() => setSidebarOpen(!sidebarOpen)}>
+          <RxHamburgerMenu className="text-3xl" />
+        </div>
+        <div className="md:block relative hidden">
           <input
             type="text"
             placeholder="Search"
@@ -16,18 +20,8 @@ const Header = () => {
             <IoIosSearch fontSize={23} />
           </span>
         </div>
-        <div className="flex items-center gap-1">
-          <Image
-            width={176}
-            height={28}
-            src={"/images/logo1.png"}
-            alt="Logo"
-            priority
-          />
-          <div className="flex flex-col text-md font-bold">
-            <h3 className="">SBS Digital Infotech</h3>
-            <span className="">April 2024</span>
-          </div>
+        <div className="flex items-center">
+          <Profile />
         </div>
       </div>
     </header>

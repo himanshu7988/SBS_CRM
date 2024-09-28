@@ -8,18 +8,20 @@ const DefaultLayout = ({ children }) => {
   return (
     <>
       <div className="flex h-screen overflow-hidden">
+        {/* Sidebar */}
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        <div className="relative flex flex-1 overflow-y-auto overflow-x-hidden bg-gray-100">
-            <div className="flex-1 flex-col">
+        {/* Main Content Area */}
+        <div className="relative flex-1 flex-col overflow-y-auto bg-gray-100">
+          {/* Header */}
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
+          {/* Main Content */}
           <main>
-            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 w-full">
+            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
               {children}
             </div>
           </main>
-          </div>
         </div>
       </div>
     </>
