@@ -48,7 +48,7 @@ export default function App() {
           <FaPlus fontSize={20} />
         </IconButton>
       </Tooltip>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur" placement="top">
         <ModalContent>
           {(onClose) => (
             <>
