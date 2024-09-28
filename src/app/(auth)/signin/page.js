@@ -3,6 +3,7 @@ import { SigninSchema } from "@/models/ValidationSchemas";
 import { Button } from "@nextui-org/react";
 import { useFormik } from "formik";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { ImEyeBlocked } from "react-icons/im";
 import { ImEye } from "react-icons/im";
@@ -15,11 +16,14 @@ const initialValues = {
 const Signin = () => {
   const [show, setShow] = useState(false);
 
+  const router = useRouter();
+
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: SigninSchema,
     onSubmit: async (values) => {
       console.log(values);
+      router.push("/dashboard");
     },
   });
 
@@ -29,7 +33,7 @@ const Signin = () => {
         <div className="bg-gray-100 h-full flex items-center justify-center flex-col">
           {/* <Image src="/images/linkup.png" alt="image" width={50} height={50} /> */}
           <div>
-            <h2 className="text-3xl font-semibold tracking-wider text-[#452c80]">
+            <h2 className="text-3xl font-semibold tracking-wider text-default">
               Let&apos;s you sign in{" "}
             </h2>
             <span className="text-lg">Welcome to our Page</span>
@@ -41,7 +45,7 @@ const Signin = () => {
                 <input
                   type="text"
                   name="email"
-                  className="px-3 py-3 rounded-lg border-2 border-[#452c80] w-[22rem]"
+                  className="px-3 py-3 rounded-lg border-2 border-default w-[22rem]"
                   value={formik.values.email}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -60,16 +64,16 @@ const Signin = () => {
                   <input
                     type={show ? "text" : "password"}
                     name="password"
-                    className="px-3 py-3 rounded-lg border-2 border-[#452c80] w-full"
+                    className="px-3 py-3 rounded-lg border-2 border-default w-full"
                     value={formik.values.password}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
-                  
+
                   {show ? (
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#452c80]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-default"
                       onClick={() => {
                         setShow(false);
                       }}
@@ -79,40 +83,39 @@ const Signin = () => {
                   ) : (
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#452c80]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-default"
                       onClick={() => {
                         setShow(true);
                       }}
                     >
-                      <ImEyeBlocked className="text-2xl"/>
+                      <ImEyeBlocked className="text-2xl" />
                     </button>
                   )}
-                  
                 </div>
                 <p className="me-1 text-xs text-red-500 text-end">
-                    {formik.touched.password && formik.errors.password
-                      ? formik.errors.password
-                      : ""}
-                  </p>
+                  {formik.touched.password && formik.errors.password
+                    ? formik.errors.password
+                    : ""}
+                </p>
               </div>
               <div className="flex flex-col items-center mt-8 gap-4">
                 <Button
                   size="lg"
-                  className="text-white text-xl font-semibold bg-[#452c80] w-[22rem]"
+                  className="text-white text-xl font-semibold bg-default w-[22rem]"
                   type="submit"
                 >
                   Log in
                 </Button>
                 <Button
                   size="lg"
-                  className="text-xl border-2 border-[#452c80] bg-white w-[22rem]"
+                  className="text-xl border-2 border-default bg-white w-[22rem]"
                 >
                   Continue With Email
                 </Button>
               </div>
-              <div className="flex items-center justify-center mt-2 text-lg">
+              <div className="flex items-center justify-center mt-3 text-lg">
                 Don&apos;t have an account?{" "}
-                <span className="text-[#452c80] underline font-semibold cursor-pointer">
+                <span className="text-default underline font-semibold cursor-pointer">
                   Sign up
                 </span>
               </div>
