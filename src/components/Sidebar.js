@@ -30,7 +30,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         </Link>
       </div>
 
-      <div className="flex flex-col justify-between px-4 py-4 md:px-6 h-full">
+      <div className="flex flex-col justify-between px-4 py-4 md:px-6 h-full overflow-y-auto scrollbar-hide gap-12">
         <ul className="flex flex-col gap-4 ">
           <li>
             <Link
@@ -128,7 +128,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
-              <IoHelpCircleSharp fontSize={25} />
+              <IoHelpCircleSharp fontSize={27} />
               Help
             </Link>
           </li>
