@@ -18,7 +18,7 @@ const page = () => {
           <span className="text-4xl font-semibold"> 1,400</span>
         </div>
       </div>
-      <div className="mt-12">
+      <div className="my-16">
         <Chart/>
       </div>
     </>

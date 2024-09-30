@@ -23,7 +23,7 @@ const Signin = () => {
     validationSchema: SigninSchema,
     onSubmit: async (values) => {
       console.log(values);
-      router.push("/dashboard");
+      router.push("/selectCompany");
     },
   });
 
