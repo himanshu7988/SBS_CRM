@@ -1,14 +1,21 @@
 import React from "react";
 import { IoIosSearch } from "react-icons/io";
 import Profile from "@/components/modals/Profile";
-import { RxHamburgerMenu } from "react-icons/rx";
+import { RxCross2, RxHamburgerMenu } from "react-icons/rx";
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {
   return (
     <header className="h-20 md:h-24 flex items-center md:px-8 px-4 md:shadow-none shadow-md">
       <div className="flex items-center justify-between flex-row-reverse md:flex-row w-full">
-        <div className="md:hidden block" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          <RxHamburgerMenu className="text-3xl" />
+        <div
+          className="md:hidden block"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          {!sidebarOpen ? (
+            <RxHamburgerMenu className="text-3xl" />
+          ) : (
+            <RxCross2 className="text-3xl" />
+          )}
         </div>
         <div className="md:block relative hidden">
           <input

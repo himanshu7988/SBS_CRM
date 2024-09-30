@@ -36,3 +36,28 @@ export const addContactSchema = Yup.object().shape({
     .max(200, "Address is too long")
     .required("Address is required"),
 });
+
+export const createCompanySchema = Yup.object().shape({
+  companyName: Yup.string()
+    .min(2, "Company name is too short")
+    .max(100, "Company name is too long")
+    .required("Company name is required"),
+
+  gstNumber: Yup.string()
+    .matches(
+      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/,
+      "Invalid GST number format"
+    )
+    .required("GST number is required"),
+
+  financialYear: Yup.number()
+    .typeError("Year must be a number")
+    .min(1000, "Year must have at least four digits")
+    .max(9999, "Year must not exceed four digits")
+    .required("Year is required"),
+
+  address: Yup.string()
+    .min(5, "Address is too short")
+    .max(200, "Address is too long")
+    .required("Address is required"),
+});

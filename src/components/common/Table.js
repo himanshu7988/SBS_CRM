@@ -16,7 +16,7 @@ const Table = ({ headCells, visibleRows }) => {
             <input
               type="text"
               placeholder="Search"
-              className="px-8 md:px-12 py-1 md:py-3 w-44 md:w-80 rounded-[2rem] focus:outline-none border-none bg-gray-100"
+              className="px-8 md:px-12 py-1 md:py-3 w-44 md:w-[17rem] rounded-[2rem] focus:outline-none border-none bg-gray-100"
             />
             <span className="absolute top-1/2 left-1 p-1 md:p-2 rounded-full bg-purple-300 -translate-y-1/2">
               <IoIosSearch className="text-md md:text-xl" />

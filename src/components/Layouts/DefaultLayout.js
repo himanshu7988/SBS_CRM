@@ -12,12 +12,12 @@ const DefaultLayout = ({ children }) => {
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* Main Content Area */}
-        <div className="relative flex-1 flex-col overflow-y-auto bg-gray-100">
+        <div className="relative flex-1 flex-col bg-gray-100">
           {/* Header */}
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
           {/* Main Content */}
-          <main>
+          <main className="overflow-y-scroll h-full">
             <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
               {children}
             </div>
