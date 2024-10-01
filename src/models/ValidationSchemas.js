@@ -60,4 +60,24 @@ export const createCompanySchema = Yup.object().shape({
     .min(5, "Address is too short")
     .max(200, "Address is too long")
     .required("Address is required"),
+
+  startDate: Yup.date()
+    .nullable()
+    .required("Start date is required")
+    .typeError("Start date must be a valid date"),
+
+  endDate: Yup.date()
+    .nullable()
+    .required("End date is required")
+    .typeError("End date must be a valid date")
+    .min(Yup.ref("startDate"), "End date must be later than start date"),
+
+  panNumber: Yup.string()
+    .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "PAN number is not valid (e.g., ABCDE1234F)")
+    .required("PAN number is required"),
+
+  email: Yup.string()
+  .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Email is not valid")
+    .email("Invalid email address")
+    .required("Email is required"),
 });
