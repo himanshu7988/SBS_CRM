@@ -5,7 +5,7 @@ import { RxCross2, RxHamburgerMenu } from "react-icons/rx";
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {
   return (
-    <header className="h-20 md:h-24 flex items-center md:px-8 px-4 md:shadow-none shadow-md">
+    <header className="h-20 md:h-24 flex items-center md:px-8 px-4 md:shadow-none shadow-md sticky top-0 bg-gray-100 z-10">
       <div className="flex items-center justify-between flex-row-reverse md:flex-row w-full">
         <div
           className="md:hidden block"

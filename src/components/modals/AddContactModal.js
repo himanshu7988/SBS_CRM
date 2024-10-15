@@ -48,7 +48,12 @@ export default function App() {
           <FaPlus fontSize={20} />
         </IconButton>
       </Tooltip>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur" placement="top">
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        backdrop="blur"
+        placement="top"
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -213,10 +218,7 @@ export default function App() {
                         : ""}
                     </p>
                   </div>
-                  <Button
-                    type="submit"
-                    className="bg-default text-white mt-4"
-                  >
+                  <Button type="submit" className="bg-default text-white mt-4">
                     Save
                   </Button>
                 </form>
