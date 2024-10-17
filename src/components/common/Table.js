@@ -1,4 +1,6 @@
-import { Tooltip } from "@mui/material";
+"use client"
+
+import { TablePagination, Tooltip } from "@mui/material";
 import React from "react";
 import AddContactModal from "@/components/modals/AddContactModal";
 import { IoIosSearch } from "react-icons/io";
@@ -78,6 +80,18 @@ const visibleRows = [
 ];
 
 const Table = () => {
+  const [page, setPage] = React.useState(0);
+  const [totalRecords, settotalRecords] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
   return (
     <div className="w-full shadow-md">
       <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
@@ -129,7 +143,18 @@ const Table = () => {
         </table>
       </div>
       <div className="border-0 border-t-0 border-black py-4 rounded-bl-lg rounded-br-lg shadow-2xl bg-white px-4">
-        {/* <h3>Footer</h3> */}
+        <TablePagination
+            rowsPerPageOptions={[5, 10, 20, 30]}
+            component="div"
+            count={totalRecords}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelDisplayedRows={({ from, to, count, page }) =>
+              `Page: ${page + 1} | ${from}-${to} of ${count !== -1 ? count : `more than ${to}`}`
+            }
+          />
       </div>
     </div>
   );
