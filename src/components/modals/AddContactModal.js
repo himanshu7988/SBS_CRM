@@ -1,6 +1,12 @@
 "use client";
 import { addContactSchema } from "@/models/ValidationSchemas";
-import { IconButton } from "@mui/material";
+import {
+  Autocomplete,
+  CircularProgress,
+  IconButton,
+  styled,
+  TextField,
+} from "@mui/material";
 import {
   Modal,
   ModalContent,
@@ -10,19 +16,49 @@ import {
   Button,
   useDisclosure,
   Tooltip,
+  Switch,
 } from "@nextui-org/react";
 import { useFormik } from "formik";
 import { useEffect } from "react";
 import { FaPlus } from "react-icons/fa6";
+import MyInput from "../common/Input";
+import MyAutocomplete from "../common/MyAutocomplete";
 
 const initialValues = {
   companyName: "",
-  contactPerson: "",
-  department: "",
+  gst: "",
+  pan: "",
   contactNo: "",
   email: "",
-  address: "",
+  address1: "",
+  address2: "",
+  city: null,
+  state: null,
+  international: false,
 };
+
+const StyledTextField = styled(TextField)(({ theme, error }) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    "& fieldset": {
+      borderColor: error ? "#ef4444" : "#d1d5db", // Default border color
+    },
+    "&:hover fieldset": {
+      borderColor: error ? "#ef4444" : "#d1d5db", // Border color on hover
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: error ? "#ef4444" : "#4f46e5", // Border color on focus
+    },
+  },
+  "& .MuiFormHelperText-root": {
+    margin: "0px",
+    fontSize: "0.75rem",
+    lineHeight: "1rem",
+    marginRight: "",
+    minHeight: "1rem",
+    marginInlineEnd: "0.25rem",
+  },
+}));
 
 export default function App() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -34,6 +70,11 @@ export default function App() {
       console.log(values);
     },
   });
+
+  const options = [
+    { label: "Cat", id: 1, type: "Animal" },
+    { label: "Set", id: 2, type: "Tool" },
+  ];
 
   useEffect(() => {
     if (!isOpen) {
@@ -53,6 +94,7 @@ export default function App() {
         onOpenChange={onOpenChange}
         backdrop="blur"
         placement="top"
+        isDismissable={false}
       >
         <ModalContent>
           {(onClose) => (
@@ -63,160 +105,223 @@ export default function App() {
               <ModalBody>
                 <form onSubmit={formik.handleSubmit}>
                   <div className="mt-1">
-                    <label
+                    <MyInput
                       htmlFor="companyName"
-                      className="block text-sm font-medium leading-6 text-gray-900"
-                    >
-                      Company Name
-                    </label>
-                    <div className="mt-1">
-                      <input
-                        id="companyName"
-                        name="companyName"
+                      id="companyName"
+                      name="companyName"
+                      type="text"
+                      label="Company Name"
+                      onChange={formik.handleChange}
+                      value={formik.values.companyName}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched.companyName && formik.errors.companyName
+                          ? formik.errors.companyName
+                          : ""
+                      }
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
+                    <div className="mt-1 col-span-2">
+                      <MyInput
+                        htmlFor="email"
+                        id="email"
+                        name="email"
                         type="text"
-                        autoComplete="companyName"
+                        label="Email"
                         onChange={formik.handleChange}
-                        value={formik.values.companyName}
+                        value={formik.values.email}
                         onBlur={formik.handleBlur}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-2"
+                        error={
+                          formik.touched.email && formik.errors.email
+                            ? formik.errors.email
+                            : ""
+                        }
                       />
                     </div>
-                    <p className=" min-h-4 me-1 text-xs text-red-500">
-                      {formik.touched.companyName && formik.errors.companyName
-                        ? formik.errors.companyName
-                        : ""}
-                    </p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
-                    <div className="mt-1">
-                      <label
-                        htmlFor="contactPerson"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Contact Person
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          id="contactPerson"
-                          name="contactPerson"
-                          type="text"
-                          autoComplete="contactPerson"
-                          onChange={formik.handleChange}
-                          value={formik.values.contactPerson}
-                          onBlur={formik.handleBlur}
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-2"
-                        />
-                      </div>
-                      <p className=" min-h-4 me-1 text-xs text-red-500">
-                        {formik.touched.contactPerson &&
-                        formik.errors.contactPerson
-                          ? formik.errors.contactPerson
-                          : ""}
-                      </p>
-                    </div>
-                    <div className="mt-1">
-                      <label
-                        htmlFor="department"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Department
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          id="department"
-                          name="department"
-                          type="text"
-                          autoComplete="department"
-                          onChange={formik.handleChange}
-                          value={formik.values.department}
-                          onBlur={formik.handleBlur}
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-2"
-                        />
-                      </div>
-                      <p className=" min-h-4 me-1 text-xs text-red-500">
-                        {formik.touched.department && formik.errors.department
-                          ? formik.errors.department
-                          : ""}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
-                    <div className="mt-1">
-                      <label
-                        htmlFor="email"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Email
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          id="email"
-                          name="email"
-                          type="text"
-                          autoComplete="email"
-                          onChange={formik.handleChange}
-                          value={formik.values.email}
-                          onBlur={formik.handleBlur}
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-2"
-                        />
-                      </div>
-                      <p className=" min-h-4 me-1 text-xs text-red-500">
-                        {formik.touched.email && formik.errors.email
-                          ? formik.errors.email
-                          : ""}
-                      </p>
-                    </div>
 
-                    <div className="mt-1">
-                      <label
-                        htmlFor="contactNo"
-                        className="block text-sm font-medium leading-6 text-gray-900"
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-2 w-full">
+                    <div className="mt-3">
+                      <Switch
+                        isSelected={formik.values.international}
+                        onValueChange={() =>
+                          formik.setFieldValue(
+                            "international",
+                            !formik.values.international
+                          )
+                        }
+                        size="sm"
+                        color="secondary"
                       >
-                        Contact No.
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          id="contactNo"
-                          name="contactNo"
-                          type="text"
-                          autoComplete="contactNo"
-                          onChange={formik.handleChange}
-                          value={formik.values.contactNo}
-                          onBlur={formik.handleBlur}
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-2"
-                        />
-                      </div>
-                      <p className=" min-h-4 me-1 text-xs text-red-500">
-                        {formik.touched.contactNo && formik.errors.contactNo
-                          ? formik.errors.contactNo
-                          : ""}
-                      </p>
+                        International
+                      </Switch>
                     </div>
+                  </div>
+                  {!formik.values?.international && (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
+                        <div className="mt-1">
+                          <MyInput
+                            htmlFor="gst"
+                            id="gst"
+                            name="gst"
+                            type="text"
+                            label="GST"
+                            onChange={formik.handleChange}
+                            value={formik.values.gst}
+                            onBlur={formik.handleBlur}
+                            error={
+                              formik.touched.gst && formik.errors.gst
+                                ? formik.errors.gst
+                                : ""
+                            }
+                          />
+                        </div>
+                        <div className="mt-1">
+                          <MyInput
+                            htmlFor="pan"
+                            id="pan"
+                            name="pan"
+                            type="text"
+                            label="PAN"
+                            onChange={formik.handleChange}
+                            value={formik.values.pan}
+                            onBlur={formik.handleBlur}
+                            error={
+                              formik.touched.pan && formik.errors.pan
+                                ? formik.errors.pan
+                                : ""
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full mt-1">
+                        <div>
+                          <MyAutocomplete
+                            label="State"
+                            isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                            }
+                            getOptionLabel={(option) => option?.label}
+                            options={options}
+                            value={formik.values?.state}
+                            onChange={(e, newValue) => {
+                              formik.setFieldValue("state", newValue);
+                            }}
+                            error={
+                              formik.touched.state && formik.errors.state
+                                ? formik.errors.state
+                                : ""
+                            }
+                            inputProps={{
+                              onBlur: formik.handleBlur,
+                              name: "state",
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <MyAutocomplete
+                            label="City"
+                            isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                            }
+                            getOptionLabel={(option) => option?.label}
+                            options={options}
+                            value={formik.values?.city}
+                            onChange={(e, newValue) => {
+                              formik.setFieldValue("city", newValue);
+                            }}
+                            error={
+                              formik.touched.city && formik.errors.city
+                                ? formik.errors.city
+                                : ""
+                            }
+                            inputProps={{
+                              onBlur: formik.handleBlur,
+                              name: "city",
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {formik.values?.international && (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
+                        <div className="mt-1">
+                          <MyInput
+                            htmlFor="state"
+                            id="state"
+                            name="state"
+                            type="text"
+                            label="State"
+                            onChange={formik.handleChange}
+                            value={formik.values.state}
+                            onBlur={formik.handleBlur}
+                            error={
+                              formik.touched.state && formik.errors.state
+                                ? formik.errors.state
+                                : ""
+                            }
+                          />
+                        </div>
+                        <div className="mt-1">
+                          <MyInput
+                            htmlFor="city"
+                            id="city"
+                            name="city"
+                            type="text"
+                            label="City"
+                            onChange={formik.handleChange}
+                            value={formik.values.city}
+                            onBlur={formik.handleBlur}
+                            error={
+                              formik.touched.city && formik.errors.city
+                                ? formik.errors.city
+                                : ""
+                            }
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="mt-1">
+                    <MyInput
+                      htmlFor="address1"
+                      id="address1"
+                      name="address1"
+                      type="text"
+                      label="Address Line 1"
+                      onChange={formik.handleChange}
+                      value={formik.values.address1}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched.address1 && formik.errors.address1
+                          ? formik.errors.address1
+                          : ""
+                      }
+                    />
                   </div>
                   <div className="mt-1">
-                    <label
-                      htmlFor="address"
-                      className="block text-sm font-medium leading-6 text-gray-900"
-                    >
-                      Address
-                    </label>
-                    <div className="mt-1">
-                      <input
-                        id="address"
-                        name="address"
-                        type="text"
-                        autoComplete="address"
-                        onChange={formik.handleChange}
-                        value={formik.values.address}
-                        onBlur={formik.handleBlur}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-2"
-                      />
-                    </div>
-                    <p className=" min-h-4 me-1 text-xs text-red-500">
-                      {formik.touched.address && formik.errors.address
-                        ? formik.errors.address
-                        : ""}
-                    </p>
+                    <MyInput
+                      htmlFor="address2"
+                      id="address2"
+                      name="address2"
+                      type="text"
+                      label="Address Line 2"
+                      onChange={formik.handleChange}
+                      value={formik.values.address2}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched.address2 && formik.errors.address2
+                          ? formik.errors.address2
+                          : ""
+                      }
+                    />
                   </div>
                   <Button type="submit" className="bg-default text-white mt-4">
                     Save
