@@ -13,28 +13,26 @@ export const addContactSchema = Yup.object().shape({
     .max(100, "Company name is too long")
     .required("Company name is required"),
 
-  contactPerson: Yup.string()
-    .min(2, "Contact person name is too short")
-    .max(50, "Contact person name is too long")
-    .required("Contact person is required"),
+  state: Yup.object().required("State is required"),
+  city: Yup.object().required("City is required"),
 
-  department: Yup.string()
-    .min(2, "Department name is too short")
-    .max(50, "Department name is too long")
-    .required("Department is required"),
+  gst: Yup.string()
+    .matches(
+      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/,
+      "Invalid GST number format"
+    )
+    .required("GST number is required"),
 
-  contactNo: Yup.string()
-    .matches(/^[0-9]{10}$/, "Contact number must be exactly 10 digits")
-    .required("Contact number is required"),
+  pan: Yup.string()
+    .matches(
+      /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+      "PAN number is not valid (e.g., ABCDE1234F)"
+    )
+    .required("PAN number is required"),
 
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
-
-  address: Yup.string()
-    .min(5, "Address is too short")
-    .max(200, "Address is too long")
-    .required("Address is required"),
 });
 
 export const createCompanySchema = Yup.object().shape({
@@ -73,11 +71,17 @@ export const createCompanySchema = Yup.object().shape({
     .min(Yup.ref("startDate"), "End date must be later than start date"),
 
   panNumber: Yup.string()
-    .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "PAN number is not valid (e.g., ABCDE1234F)")
+    .matches(
+      /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+      "PAN number is not valid (e.g., ABCDE1234F)"
+    )
     .required("PAN number is required"),
 
   email: Yup.string()
-  .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Email is not valid")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      "Email is not valid"
+    )
     .email("Invalid email address")
     .required("Email is required"),
 });
