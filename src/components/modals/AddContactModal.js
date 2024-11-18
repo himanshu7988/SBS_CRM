@@ -34,7 +34,10 @@ const initialValues = {
   address2: "",
   city: null,
   state: null,
-  international: false,
+  country: null,
+  openingAmount: 0,
+  crDr: { label: "Credit", id: 1, type: "Cr" },
+  // international: false,
 };
 
 const StyledTextField = styled(TextField)(({ theme, error }) => ({
@@ -72,8 +75,8 @@ export default function App() {
   });
 
   const options = [
-    { label: "Cat", id: 1, type: "Animal" },
-    { label: "Set", id: 2, type: "Tool" },
+    { label: "Credit", id: 1, type: "Cr" },
+    { label: "Debit", id: 2, type: "Dr" },
   ];
 
   useEffect(() => {
@@ -141,154 +144,115 @@ export default function App() {
                       />
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-2 w-full">
-                    <div className="mt-3">
-                      <Switch
-                        isSelected={formik.values.international}
-                        onValueChange={() =>
-                          formik.setFieldValue(
-                            "international",
-                            !formik.values.international
-                          )
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
+                    <div className="mt-1">
+                      <MyInput
+                        htmlFor="gst"
+                        id="gst"
+                        name="gst"
+                        type="text"
+                        label="GST"
+                        onChange={formik.handleChange}
+                        value={formik.values.gst}
+                        onBlur={formik.handleBlur}
+                        error={
+                          formik.touched.gst && formik.errors.gst
+                            ? formik.errors.gst
+                            : ""
                         }
-                        size="sm"
-                        color="secondary"
-                      >
-                        International
-                      </Switch>
+                      />
+                    </div>
+                    <div className="mt-1">
+                      <MyInput
+                        htmlFor="pan"
+                        id="pan"
+                        name="pan"
+                        type="text"
+                        label="PAN"
+                        onChange={formik.handleChange}
+                        value={formik.values.pan}
+                        onBlur={formik.handleBlur}
+                        error={
+                          formik.touched.pan && formik.errors.pan
+                            ? formik.errors.pan
+                            : ""
+                        }
+                      />
                     </div>
                   </div>
-                  {!formik.values?.international && (
-                    <>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
-                        <div className="mt-1">
-                          <MyInput
-                            htmlFor="gst"
-                            id="gst"
-                            name="gst"
-                            type="text"
-                            label="GST"
-                            onChange={formik.handleChange}
-                            value={formik.values.gst}
-                            onBlur={formik.handleBlur}
-                            error={
-                              formik.touched.gst && formik.errors.gst
-                                ? formik.errors.gst
-                                : ""
-                            }
-                          />
-                        </div>
-                        <div className="mt-1">
-                          <MyInput
-                            htmlFor="pan"
-                            id="pan"
-                            name="pan"
-                            type="text"
-                            label="PAN"
-                            onChange={formik.handleChange}
-                            value={formik.values.pan}
-                            onBlur={formik.handleBlur}
-                            error={
-                              formik.touched.pan && formik.errors.pan
-                                ? formik.errors.pan
-                                : ""
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full mt-1">
-                        <div>
-                          <MyAutocomplete
-                            label="State"
-                            isOptionEqualToValue={(option, value) =>
-                              option.id === value.id
-                            }
-                            getOptionLabel={(option) => option?.label}
-                            options={options}
-                            value={formik.values?.state}
-                            onChange={(e, newValue) => {
-                              formik.setFieldValue("state", newValue);
-                            }}
-                            error={
-                              formik.touched.state && formik.errors.state
-                                ? formik.errors.state
-                                : ""
-                            }
-                            inputProps={{
-                              onBlur: formik.handleBlur,
-                              name: "state",
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <MyAutocomplete
-                            label="City"
-                            isOptionEqualToValue={(option, value) =>
-                              option.id === value.id
-                            }
-                            getOptionLabel={(option) => option?.label}
-                            options={options}
-                            value={formik.values?.city}
-                            onChange={(e, newValue) => {
-                              formik.setFieldValue("city", newValue);
-                            }}
-                            error={
-                              formik.touched.city && formik.errors.city
-                                ? formik.errors.city
-                                : ""
-                            }
-                            inputProps={{
-                              onBlur: formik.handleBlur,
-                              name: "city",
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {formik.values?.international && (
-                    <>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
-                        <div className="mt-1">
-                          <MyInput
-                            htmlFor="state"
-                            id="state"
-                            name="state"
-                            type="text"
-                            label="State"
-                            onChange={formik.handleChange}
-                            value={formik.values.state}
-                            onBlur={formik.handleBlur}
-                            error={
-                              formik.touched.state && formik.errors.state
-                                ? formik.errors.state
-                                : ""
-                            }
-                          />
-                        </div>
-                        <div className="mt-1">
-                          <MyInput
-                            htmlFor="city"
-                            id="city"
-                            name="city"
-                            type="text"
-                            label="City"
-                            onChange={formik.handleChange}
-                            value={formik.values.city}
-                            onBlur={formik.handleBlur}
-                            error={
-                              formik.touched.city && formik.errors.city
-                                ? formik.errors.city
-                                : ""
-                            }
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full mt-1">
+                    <div className="col-span-2">
+                      <MyAutocomplete
+                        label="Country"
+                        isOptionEqualToValue={(option, value) =>
+                          option.id === value.id
+                        }
+                        getOptionLabel={(option) => option?.label}
+                        options={options}
+                        value={formik.values?.country}
+                        onChange={(e, newValue) => {
+                          formik.setFieldValue("country", newValue);
+                        }}
+                        error={
+                          formik.touched.country && formik.errors.country
+                            ? formik.errors.country
+                            : ""
+                        }
+                        inputProps={{
+                          onBlur: formik.handleBlur,
+                          name: "country",
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full mt-1">
+                    <div>
+                      <MyAutocomplete
+                        label="State"
+                        isOptionEqualToValue={(option, value) =>
+                          option.id === value.id
+                        }
+                        getOptionLabel={(option) => option?.label}
+                        options={options}
+                        value={formik.values?.state}
+                        onChange={(e, newValue) => {
+                          formik.setFieldValue("state", newValue);
+                        }}
+                        error={
+                          formik.touched.state && formik.errors.state
+                            ? formik.errors.state
+                            : ""
+                        }
+                        inputProps={{
+                          onBlur: formik.handleBlur,
+                          name: "state",
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <MyAutocomplete
+                        label="City"
+                        isOptionEqualToValue={(option, value) =>
+                          option.id === value.id
+                        }
+                        getOptionLabel={(option) => option?.label}
+                        options={options}
+                        value={formik.values?.city}
+                        onChange={(e, newValue) => {
+                          formik.setFieldValue("city", newValue);
+                        }}
+                        error={
+                          formik.touched.city && formik.errors.city
+                            ? formik.errors.city
+                            : ""
+                        }
+                        inputProps={{
+                          onBlur: formik.handleBlur,
+                          name: "city",
+                        }}
+                      />
+                    </div>
+                  </div>
                   <div className="mt-1">
                     <MyInput
                       htmlFor="address1"
@@ -322,6 +286,50 @@ export default function App() {
                           : ""
                       }
                     />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full mt-1">
+                    <div className="">
+                      <MyInput
+                        htmlFor="openingAmount"
+                        id="openingAmount"
+                        name="openingAmount"
+                        type="text"
+                        label="Opening Amount"
+                        onChange={formik.handleChange}
+                        value={formik.values.openingAmount}
+                        onBlur={formik.handleBlur}
+                        error={
+                          formik.touched.openingAmount &&
+                          formik.errors.openingAmount
+                            ? formik.errors.openingAmount
+                            : ""
+                        }
+                      />
+                    </div>
+                    <div>
+                      <MyAutocomplete
+                        disableClearable
+                        label="Balance Type"
+                        isOptionEqualToValue={(option, value) =>
+                          option.id === value.id
+                        }
+                        getOptionLabel={(option) => option?.label}
+                        options={options}
+                        value={formik.values?.crDr}
+                        onChange={(e, newValue) => {
+                          formik.setFieldValue("crDr", newValue);
+                        }}
+                        error={
+                          formik.touched.crDr && formik.errors.crDr
+                            ? formik.errors.crDr
+                            : ""
+                        }
+                        inputProps={{
+                          onBlur: formik.handleBlur,
+                          name: "crDr",
+                        }}
+                      />
+                    </div>
                   </div>
                   <Button type="submit" className="bg-default text-white mt-4">
                     Save

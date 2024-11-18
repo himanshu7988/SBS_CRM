@@ -1,0 +1,1 @@
+export const BaseColor = "#1c2434";

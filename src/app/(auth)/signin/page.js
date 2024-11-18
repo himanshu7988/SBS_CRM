@@ -1,6 +1,8 @@
 "use client";
+import { login } from "@/config/Api";
 import { SigninSchema } from "@/models/ValidationSchemas";
 import { Button } from "@nextui-org/react";
+import axios from "axios";
 import { useFormik } from "formik";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -22,8 +24,21 @@ const Signin = () => {
     initialValues: initialValues,
     validationSchema: SigninSchema,
     onSubmit: async (values) => {
-      console.log(values);
-      router.push("/selectCompany");
+      // console.log(values);
+      // router.push("/selectCompany");
+      try {
+        const response = await login(values);
+
+        // Check for success
+        if (response.data && response.data.token) {
+          // Redirect after successful login
+          router.push("/selectCompany");
+        } else {
+          setError("Unexpected error occurred.");
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Login failed");
+      }
     },
   });
 
