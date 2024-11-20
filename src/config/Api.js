@@ -32,6 +32,9 @@ export const getCompanyById = async (companyid) => {
     `${BASE_URL}Client/FetchCompanyByID?companyid=${companyid}`
   );
 };
+export const GetRoleList = async (data) => {
+  return await apiClient.get(`${BASE_URL}admin/GetRoleList?page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}`);
+};
 export const login = async (data) => {
   return await axios.post(`${BASE_URL}admin/login`, data, {
     withCredentials: true, // Ensures cookies are sent/received
@@ -39,4 +42,7 @@ export const login = async (data) => {
 };
 export const CreateCompanyApi = async (data) => {
   return await apiClient.post(`${BASE_URL}admin/CreateCompany`, data);
+};
+export const CreateRole = async (data) => {
+  return await apiClient.post(`${BASE_URL}admin/CreateRole`, data);
 };
