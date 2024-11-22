@@ -8,7 +8,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { FaPlus } from "react-icons/fa6";
 import { Skeleton, Spinner } from "@nextui-org/react";
-import { GetRoleList } from "@/config/Api";
+import { DeleteRole, GetRoleList } from "@/config/Api";
 import { toast } from "react-toastify";
 
 const headCells = [
@@ -38,6 +38,7 @@ const Page = () => {
   const [isOpenAdd, setIsOpenAdd] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState("");
   const [visibleRows, setVisibleRows] = useState([]);
   const [searchData, setSearchData] = useState("");
 
@@ -64,7 +65,48 @@ const Page = () => {
     setPage(0);
   };
 
+  const deleteData = async (id) => {
+    const resolveWithSomeData = new Promise(async (resolve, reject) => {
+      await DeleteRole(id)
+        .then((res) => {
+          if (res.data.success) {
+            resolve(res.data.message);
+            setLoaded(false);
+            onClose();
+          } else {
+            reject(res.data.message);
+          }
+        })
+        .catch((err) => {
+          if (err.response?.data?.message) {
+            return reject(err.response?.data?.message);
+          }
+          reject(err.message);
+        });
+    });
+    toast.promise(resolveWithSomeData, {
+      pending: {
+        render() {
+          return "Deleting...";
+        },
+      },
+      success: {
+        render({ data }) {
+          return `${data}`;
+        },
+      },
+      error: {
+        render({ data }) {
+          // When the promise reject, data will contains the error
+          return `${data}`;
+        },
+      },
+    });
+  };
+
   const getData = async () => {
+    setError("");
+    setLoading(true);
     await GetRoleList({
       page: page + 1,
       pageSize: rowsPerPage,
@@ -79,10 +121,14 @@ const Page = () => {
         }
       })
       .catch((err) => {
+        setError(err?.message);
         if (err.response?.data?.message) {
           return toast.error(err.response?.data?.message);
         }
         toast.error(err?.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -91,14 +137,13 @@ const Page = () => {
       return setLoaded(true);
     }
     getData();
-  }, [loaded, searchData]);
+  }, [loaded, searchData, page, rowsPerPage]);
 
   return (
     <>
       <div className="w-full shadow-md">
         <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
           <h3 className="text-lg md:text-2xl font-semibold text-default ">
-            {" "}
             Roles
           </h3>
           <div className="flex items-center gap-1 md:gap-4">
@@ -147,23 +192,25 @@ const Page = () => {
               {!loading &&
                 visibleRows.map((item, i) => (
                   <tr key={i}>
-                    <td align="left">{i + 1}</td>
+                    <td align="left">{i + 1 + rowsPerPage * page}</td>
                     <td align="left">{item?.roleName}</td>
                     <td align="center">
                       <Tooltip arrow title="Edit">
                         <IconButton
-                          aria-label="Edit"
                           size="small"
-                          onClick={() => {}}
+                          onClick={() => {
+                            onEdit(item);
+                          }}
                         >
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip arrow title="Delete">
                         <IconButton
-                          aria-label="View"
                           size="small"
-                          onClick={() => {}}
+                          onClick={() => {
+                            deleteData(item?._id);
+                          }}
                         >
                           <DeleteIcon
                             className="text-red-500"
@@ -183,14 +230,19 @@ const Page = () => {
             Loading.....
           </p>
         )}
-        {!loading && !visibleRows.length && (
+        {!loading && !visibleRows.length && error == "" && (
           <p className="justify-center text-xl font-semibold py-10 bg-white flex gap-3">
             No Data Found.
           </p>
         )}
+        {error !== "" && (
+          <p className="justify-center text-xl font-semibold py-10 bg-white flex gap-3 text-red-500">
+            {error} !
+          </p>
+        )}
         <div className="border-0 border-t-0 border-black py-4 rounded-bl-lg rounded-br-lg shadow-2xl bg-white px-4">
           <TablePagination
-            rowsPerPageOptions={[5, 10, 20, 30]}
+            rowsPerPageOptions={[10, 20, 30, 50]}
             component="div"
             count={totalRecords}
             rowsPerPage={rowsPerPage}

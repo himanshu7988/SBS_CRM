@@ -12,7 +12,7 @@ import { useFormik } from "formik";
 import { useEffect } from "react";
 import MyInput from "../common/Input";
 import { roleSchema } from "@/models/RoleSchemas";
-import { CreateRole } from "@/config/Api";
+import { CreateRole, UpdateRole } from "@/config/Api";
 import { toast } from "react-toastify";
 
 const initialValues = {
@@ -42,32 +42,61 @@ const StyledTextField = styled(TextField)(({ theme, error }) => ({
   },
 }));
 
-export default function RoleModal({ formFor, currentData, isOpen, onClose,setLoaded }) {
+export default function RoleModal({
+  formFor,
+  currentData,
+  isOpen,
+  onClose,
+  setLoaded,
+}) {
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: roleSchema,
     onSubmit: async (values) => {
       formik.setSubmitting(true);
       const resolveWithSomeData = new Promise(async (resolve, reject) => {
-        await CreateRole(values)
-          .then((res) => {
-            if (res.data.success) {
-              resolve(res.data.message);
-              setLoaded(false);
-              onClose();
-            } else {
-              reject(res.data.message);
-            }
-          })
-          .catch((err) => {
-            if (err.response?.data?.message) {
-              return reject(err.response?.data?.message);
-            }
-            reject(err.message);
-          })
-          .finally(() => {
-            formik.setSubmitting(false);
-          });
+        if (formFor == "Add") {
+          await CreateRole(values)
+            .then((res) => {
+              if (res.data.success) {
+                resolve(res.data.message);
+                setLoaded(false);
+                onClose();
+              } else {
+                reject(res.data.message);
+              }
+            })
+            .catch((err) => {
+              if (err.response?.data?.message) {
+                return reject(err.response?.data?.message);
+              }
+              reject(err.message);
+            })
+            .finally(() => {
+              formik.setSubmitting(false);
+            });
+        }
+        if (formFor == "Update") {
+          await UpdateRole(currentData._id, values)
+            .then((res) => {
+              if (res.data.success) {
+                resolve(res.data.message);
+                setLoaded(false);
+                onClose();
+              } else {
+                reject(res.data.message);
+              }
+            })
+            .catch((err) => {
+              if (err.response?.data?.message) {
+                return reject(err.response?.data?.message);
+              }
+              reject(err.message);
+            })
+            .finally(() => {
+              formik.setSubmitting(false);
+            });
+        }
       });
 
       toast.promise(resolveWithSomeData, {
@@ -99,6 +128,9 @@ export default function RoleModal({ formFor, currentData, isOpen, onClose,setLoa
   useEffect(() => {
     if (!isOpen) {
       formik.resetForm();
+    }
+    if(formFor=="Update"){
+      formik.setValues(currentData);
     }
   }, [isOpen]);
 
@@ -134,7 +166,11 @@ export default function RoleModal({ formFor, currentData, isOpen, onClose,setLoa
                   }
                 />
               </div>
-              <Button type="submit" className="bg-default text-white mt-4" isLoading={formik.isSubmitting}>
+              <Button
+                type="submit"
+                className="bg-default text-white mt-4"
+                isLoading={formik.isSubmitting}
+              >
                 Save
               </Button>
             </form>
