@@ -20,7 +20,12 @@ const SelectCompany = () => {
               src={"/images/linkup.png"}
               alt="Logo"
             />
+            <div className="flex gap-3">
+             <Button className="text-default bg-white border-default border font-medium" onClick={()=>router.push('/adminDashboard')}>
+        Admin Dashboard
+      </Button>
             <CreateCompany />
+      </div>
           </div>
           <div>
             <h2 className="text-4xl font-semibold text-default flex items-center justify-center gap-2">

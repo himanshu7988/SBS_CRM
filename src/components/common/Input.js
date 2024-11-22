@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const MyInput = ({
   htmlFor,
@@ -6,8 +6,28 @@ const MyInput = ({
   error,
   className,
   autoComplete,
+  inputAdornmentEnd,
+  inputAdornmentStart,
   ...props
 }) => {
+  const spanRefEnd = useRef(null);
+  const spanRefStart = useRef(null);
+  const [spanWidthEnd, setSpanWidthEnd] = useState(0);
+  const [spanWidthStart, setSpanWidthStart] = useState(0);
+
+  // Update the padding based on span width
+  useEffect(() => {
+    if (spanRefEnd.current) {
+      // Set span width dynamically
+      setSpanWidthEnd(spanRefEnd.current.offsetWidth);
+    }
+  }, [spanRefEnd.current]);
+  useEffect(() => {
+    if (spanRefStart.current) {
+      // Set span width dynamically
+      setSpanWidthStart(spanRefStart.current.offsetWidth);
+    }
+  }, [spanRefStart.current]);
   return (
     <>
       <label
@@ -16,7 +36,7 @@ const MyInput = ({
       >
         {label}
       </label>
-      <div className="mt-1">
+      <div className="mt-1 relative">
         <input
           {...props}
           autoComplete={autoComplete ? autoComplete : "new-password"}
@@ -25,7 +45,27 @@ const MyInput = ({
           } placeholder:text-gray-400 focus:ring-2 focus:ring-inset ${
             error ? "focus:ring-red-500" : "focus:ring-indigo-600"
           } sm:text-sm sm:leading-6 px-2`}
+          style={{
+            paddingRight: spanWidthEnd ? `${spanWidthEnd + 15}px` : "",
+            paddingLeft: spanWidthStart ? `${spanWidthStart + 15}px` : "",
+          }}
         />
+        {inputAdornmentEnd && (
+          <span
+            ref={spanRefEnd}
+            className="absolute top-1/2 -translate-y-1/2 right-2"
+          >
+            {inputAdornmentEnd}
+          </span>
+        )}
+        {inputAdornmentStart && (
+          <span
+            ref={spanRefStart}
+            className="absolute top-1/2 -translate-y-1/2 left-2"
+          >
+            {inputAdornmentStart}
+          </span>
+        )}
       </div>
       {error && <p className=" min-h-4 me-1 text-xs text-red-500">{error}</p>}
     </>

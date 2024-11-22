@@ -2,16 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { BiSolidDashboard } from "react-icons/bi";
-import { FaHandshake, FaRegCircleUser } from "react-icons/fa6";
+import { FaHandshake, FaRegCircleUser, FaUsersGear } from "react-icons/fa6";
+import { TiArrowBack } from "react-icons/ti";
 import { FaUsers } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
-import { MdMessage } from "react-icons/md";
-import { TbReportSearch } from "react-icons/tb";
-import { IoHelpCircleSharp } from "react-icons/io5";
+import { VscBriefcase } from "react-icons/vsc";
+// import { MdMessage } from "react-icons/md";
+// import { TbReportSearch } from "react-icons/tb";
+// import { IoHelpCircleSharp } from "react-icons/io5";
 import { usePathname } from "next/navigation";
-import { TiArrowBack } from "react-icons/ti";
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const pathname = usePathname();
 
   return (
@@ -40,11 +41,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         <ul className="flex flex-col gap-4 ">
           <li>
             <Link
-              href="/dashboard"
+              href="/adminDashboard"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer 
                 ${
-                  (pathname === "/" || pathname === "/dashboard") &&
+                  (pathname === "/" || pathname === "/adminDashboard") &&
                   "text-yellow-400 border-r-4 border-yellow-400"
                 }`}
             >
@@ -54,44 +55,44 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/companies"
+              href="/adminDashboard/companyManagement"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/companies") &&
+                pathname.includes("/adminDashboard/companyManagement") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
-              <FaUsers fontSize={25} />
+              <VscBriefcase fontSize={25} />
               Companies
             </Link>
           </li>
           <li>
             <Link
-              href="/dashboard/deals"
+              href="/adminDashboard/users"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/deals") &&
+                pathname.includes("/adminDashboard/users") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
-              <FaHandshake fontSize={25} />
-              Deals
+              <FaUsers fontSize={25} />
+              Users
             </Link>
           </li>
           <li>
             <Link
-              href="/dashboard/contact"
+              href="/adminDashboard/roles"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/contact") &&
+                pathname.includes("/adminDashboard/roles") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
-              <FaRegCircleUser fontSize={25} />
-              Contacts
+              <FaUsersGear fontSize={25} />
+              Roles
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               href="/dashboard/reports"
               onClick={() => setSidebarOpen(false)}
@@ -129,7 +130,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               <IoHelpCircleSharp fontSize={27} />
               Help
             </Link>
-          </li>
+          </li> */}
         </ul>
 
         <ul>
@@ -152,4 +153,4 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   );
 };
 
-export default Sidebar;
+export default AdminSidebar;

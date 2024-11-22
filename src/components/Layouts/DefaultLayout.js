@@ -2,14 +2,24 @@
 import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import { usePathname } from "next/navigation";
+import AdminSidebar from "../AdminSidebar";
 
 const DefaultLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
   return (
     <>
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        {pathname.includes("/adminDashboard") ? (
+          <AdminSidebar
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+          />
+        ) : (
+          <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        )}
 
         {/* Main Content Area */}
         <div className="relative flex-1 flex-col bg-gray-100 overflow-y-auto">

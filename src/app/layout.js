@@ -1,5 +1,6 @@
 import "./globals.css";
 import "@/css/table.css";
+import 'react-toastify/dist/ReactToastify.css';
 import Provider from "@/app/Provider";
 import { Poppins } from '@next/font/google';
 

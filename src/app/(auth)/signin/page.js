@@ -1,12 +1,15 @@
 "use client";
+import { login } from "@/config/Api";
 import { SigninSchema } from "@/models/ValidationSchemas";
 import { Button } from "@nextui-org/react";
+import axios from "axios";
 import { useFormik } from "formik";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { ImEyeBlocked } from "react-icons/im";
 import { ImEye } from "react-icons/im";
+import { toast } from "react-toastify";
 
 const initialValues = {
   email: "",
@@ -22,8 +25,26 @@ const Signin = () => {
     initialValues: initialValues,
     validationSchema: SigninSchema,
     onSubmit: async (values) => {
-      console.log(values);
-      router.push("/selectCompany");
+      formik.setSubmitting(true);
+      // router.push("/selectCompany");
+      try {
+        const response = await login(values);
+
+        // Check for success
+        if (response.data && response.data.token) {
+          // Redirect after successful login
+          router.push("/selectCompany");
+        } else {
+          toast.error("Unexpected error occurred.");
+        }
+      } catch (err) {
+        if (err.response?.data?.message) {
+          return toast.error(err.response?.data?.message);
+        }
+        toast.error(err?.message);
+      } finally {
+        formik.setSubmitting(false);
+      }
     },
   });
 
@@ -103,12 +124,14 @@ const Signin = () => {
                   size="lg"
                   className="text-white text-xl font-semibold bg-default w-[22rem]"
                   type="submit"
+                  isLoading={formik.isSubmitting}
                 >
                   Log in
                 </Button>
                 <Button
                   size="lg"
                   className="text-xl border-2 border-default bg-white w-[22rem]"
+                  isDisabled={formik.isSubmitting}
                 >
                   Continue With Email
                 </Button>

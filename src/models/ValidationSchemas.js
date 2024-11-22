@@ -13,6 +13,7 @@ export const addContactSchema = Yup.object().shape({
     .max(100, "Company name is too long")
     .required("Company name is required"),
 
+  country: Yup.object().required("Country is required"),
   state: Yup.object().required("State is required"),
   city: Yup.object().required("City is required"),
 
@@ -41,36 +42,41 @@ export const createCompanySchema = Yup.object().shape({
     .max(100, "Company name is too long")
     .required("Company name is required"),
 
-  gstNumber: Yup.string()
+  gst: Yup.string()
     .matches(
       /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/,
       "Invalid GST number format"
     )
     .required("GST number is required"),
 
-  financialYear: Yup.number()
-    .typeError("Year must be a number")
-    .min(1000, "Year must have at least four digits")
-    .max(9999, "Year must not exceed four digits")
-    .required("Year is required"),
+  // financialYear: Yup.number()
+  //   .typeError("Year must be a number")
+  //   .min(1000, "Year must have at least four digits")
+  //   .max(9999, "Year must not exceed four digits")
+  //   .required("Year is required"),
 
-  address: Yup.string()
+  billingAaddress: Yup.string()
     .min(5, "Address is too short")
     .max(200, "Address is too long")
     .required("Address is required"),
 
-  startDate: Yup.date()
-    .nullable()
-    .required("Start date is required")
-    .typeError("Start date must be a valid date"),
+  // beginYear: Yup.string()
+  //   .nullable()
+  //   .required("Start date is required")
+  //   .typeError("Start date must be a valid date"),
 
-  endDate: Yup.date()
-    .nullable()
-    .required("End date is required")
-    .typeError("End date must be a valid date")
-    .min(Yup.ref("startDate"), "End date must be later than start date"),
+  // startDate: Yup.date()
+  //   .nullable()
+  //   .required("Start date is required")
+  //   .typeError("Start date must be a valid date"),
 
-  panNumber: Yup.string()
+  // endDate: Yup.date()
+  //   .nullable()
+  //   .required("End date is required")
+  //   .typeError("End date must be a valid date")
+  //   .min(Yup.ref("startDate"), "End date must be later than start date"),
+
+  pan: Yup.string()
     .matches(
       /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
       "PAN number is not valid (e.g., ABCDE1234F)"
