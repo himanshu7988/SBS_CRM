@@ -4,7 +4,6 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { usePathname } from "next/navigation";
 import AdminSidebar from "../AdminSidebar";
-import { ToastContainer } from "react-toastify";
 
 const DefaultLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,12 +34,6 @@ const DefaultLayout = ({ children }) => {
           </main>
         </div>
       </div>
-      <ToastContainer
-        autoClose={3000}
-        theme="colored"
-        pauseOnFocusLoss={false}
-        hideProgressBar={true}
-      />
     </>
   );
 };

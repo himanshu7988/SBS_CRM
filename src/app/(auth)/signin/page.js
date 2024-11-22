@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { ImEyeBlocked } from "react-icons/im";
 import { ImEye } from "react-icons/im";
+import { toast } from "react-toastify";
 
 const initialValues = {
   email: "",
@@ -34,10 +35,13 @@ const Signin = () => {
           // Redirect after successful login
           router.push("/selectCompany");
         } else {
-          setError("Unexpected error occurred.");
+          toast.error("Unexpected error occurred.");
         }
       } catch (err) {
-        setError(err.response?.data?.message || "Login failed");
+        if (err.response?.data?.message) {
+          return toast.error(err.response?.data?.message);
+        }
+        toast.error(err?.message);
       }
     },
   });
