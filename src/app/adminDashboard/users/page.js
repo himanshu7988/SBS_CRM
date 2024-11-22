@@ -1,16 +1,25 @@
 "use client";
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import UsersModal, { UserType } from "@/components/modals/UsersModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { FaPlus } from "react-icons/fa6";
-import { Skeleton, Spinner } from "@nextui-org/react";
-import { DeleteRole, GetUsersList } from "@/config/Api";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Skeleton,
+  Spinner,
+} from "@nextui-org/react";
+import { DeleteUser, GetUsersList } from "@/config/Api";
 import { toast } from "react-toastify";
 import { GetActiveLabel } from "@/components/common/GlobalFunctions";
+import { debounce } from "lodash";
+import { MdMoreVert } from "react-icons/md";
 
 const headCells = [
   {
@@ -66,6 +75,11 @@ const Page = () => {
     setCurrentData(row);
     setIsOpenAdd(true);
   };
+  const onReset = (row) => {
+    setFormFor("resetPass");
+    setCurrentData(row);
+    setIsOpenAdd(true);
+  };
   const onClose = () => {
     setFormFor("Add");
     setCurrentData(null);
@@ -83,7 +97,7 @@ const Page = () => {
 
   const deleteData = async (id) => {
     const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await DeleteRole(id)
+      await DeleteUser(id)
         .then((res) => {
           if (res.data.success) {
             resolve(res.data.message);
@@ -120,13 +134,13 @@ const Page = () => {
     });
   };
 
-  const getData = async () => {
+  const getData = async (text) => {
     setError("");
     setLoading(true);
     await GetUsersList({
       page: page + 1,
       pageSize: rowsPerPage,
-      search: searchData,
+      search: text ? text : searchData,
     })
       .then((res) => {
         if (res?.data?.success) {
@@ -147,6 +161,13 @@ const Page = () => {
         setLoading(false);
       });
   };
+
+  const handleSearch = useCallback(
+    debounce((value) => {
+      getData(value);
+    }, 500),
+    []
+  );
 
   useEffect(() => {
     if (!loaded) {
@@ -176,7 +197,10 @@ const Page = () => {
                 placeholder="Search"
                 className="px-8 md:px-12 py-1 md:py-3 w-40 md:w-[17rem] rounded-[2rem] focus:outline-none border-none bg-gray-100"
                 value={searchData}
-                onChange={(e) => setSearchData(e.target.value)}
+                onChange={(e) => {
+                  setSearchData(e.target.value);
+                  // handleSearch(e.target.value);
+                }}
               />
               <span className="absolute top-1/2 left-1 p-1 md:p-2 rounded-full bg-purple-300 -translate-y-1/2">
                 <IoIosSearch className="text-md md:text-xl" />
@@ -244,6 +268,30 @@ const Page = () => {
                           />
                         </IconButton>
                       </Tooltip>
+                      <Dropdown>
+                        <DropdownTrigger>
+                          <Tooltip arrow title="Delete">
+                            <IconButton variant="bordered">
+                              <MdMoreVert />
+                            </IconButton>
+                          </Tooltip>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                          variant="faded"
+                          aria-label="Dropdown menu with icons"
+                        >
+                          <DropdownItem
+                            key="new"
+                            // shortcut="⌘N"
+                            // startContent={<AddNoteIcon className={iconClasses} />}
+                            onClick={() => {
+                              onReset(item);
+                            }}
+                          >
+                            Reset Password
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
                     </td>
                   </tr>
                 ))}

@@ -49,9 +49,18 @@ export const CreateCompanyApi = async (data) => {
 export const CreateRole = async (data) => {
   return await apiClient.post(`${BASE_URL}admin/CreateRole`, data);
 };
+export const CreateUser = async (data) => {
+  return await apiClient.post(`${BASE_URL}admin/CreateUser`, data);
+};
 export const UpdateRole = async (id,data) => {
   return await apiClient.patch(`${BASE_URL}admin/UpdateRole?_id=${id}`, data);
 };
+export const UpdateUser = async (id,data) => {
+  return await apiClient.patch(`${BASE_URL}admin/UpdateUser?_id=${id}`, data);
+};
 export const DeleteRole = async (id) => {
   return await apiClient.delete(`${BASE_URL}admin/DeleteRole?_id=${id}`);
+};
+export const DeleteUser = async (id) => {
+  return await apiClient.delete(`${BASE_URL}admin/DeleteUser?_id=${id}`);
 };

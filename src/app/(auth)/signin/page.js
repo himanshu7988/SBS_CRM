@@ -25,7 +25,7 @@ const Signin = () => {
     initialValues: initialValues,
     validationSchema: SigninSchema,
     onSubmit: async (values) => {
-      // console.log(values);
+      formik.setSubmitting(true);
       // router.push("/selectCompany");
       try {
         const response = await login(values);
@@ -42,6 +42,8 @@ const Signin = () => {
           return toast.error(err.response?.data?.message);
         }
         toast.error(err?.message);
+      } finally {
+        formik.setSubmitting(false);
       }
     },
   });
@@ -122,12 +124,14 @@ const Signin = () => {
                   size="lg"
                   className="text-white text-xl font-semibold bg-default w-[22rem]"
                   type="submit"
+                  isLoading={formik.isSubmitting}
                 >
                   Log in
                 </Button>
                 <Button
                   size="lg"
                   className="text-xl border-2 border-default bg-white w-[22rem]"
+                  isDisabled={formik.isSubmitting}
                 >
                   Continue With Email
                 </Button>

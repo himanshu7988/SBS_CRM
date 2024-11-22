@@ -120,16 +120,11 @@ export default function RoleModal({
     },
   });
 
-  const options = [
-    { label: "Credit", id: 1, type: "Cr" },
-    { label: "Debit", id: 2, type: "Dr" },
-  ];
-
   useEffect(() => {
     if (!isOpen) {
       formik.resetForm();
     }
-    if(formFor=="Update"){
+    if (formFor == "Update") {
       formik.setValues(currentData);
     }
   }, [isOpen]);
