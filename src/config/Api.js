@@ -35,6 +35,9 @@ export const getCompanyById = async (companyid) => {
 export const GetRoleList = async (data) => {
   return await apiClient.get(`${BASE_URL}admin/GetRoleList?page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}`);
 };
+export const GetCompanyList = async (data) => {
+  return await apiClient.get(`${BASE_URL}admin/GetCompanyList?page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}`);
+};
 export const GetUsersList = async (data) => {
   return await apiClient.get(`${BASE_URL}admin/GetUsersList?page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}`);
 };
@@ -43,7 +46,7 @@ export const login = async (data) => {
     withCredentials: true, // Ensures cookies are sent/received
   });
 };
-export const CreateCompanyApi = async (data) => {
+export const CreateCompany = async (data) => {
   return await apiClient.post(`${BASE_URL}admin/CreateCompany`, data);
 };
 export const CreateRole = async (data) => {
@@ -57,6 +60,12 @@ export const UpdateRole = async (id,data) => {
 };
 export const UpdateUser = async (id,data) => {
   return await apiClient.patch(`${BASE_URL}admin/UpdateUser?_id=${id}`, data);
+};
+export const UpdateCompany = async (id,data) => {
+  return await apiClient.patch(`${BASE_URL}admin/UpdateCompany?_id=${id}`, data);
+};
+export const UpdateUserPassword = async (id,data) => {
+  return await apiClient.patch(`${BASE_URL}admin/UpdateUserPassword?_id=${id}`, data);
 };
 export const DeleteRole = async (id) => {
   return await apiClient.delete(`${BASE_URL}admin/DeleteRole?_id=${id}`);

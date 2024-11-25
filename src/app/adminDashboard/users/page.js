@@ -15,7 +15,7 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
-import { DeleteUser, GetUsersList } from "@/config/Api";
+import { DeleteUser, GetUsersList, UpdateUser } from "@/config/Api";
 import { toast } from "react-toastify";
 import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
@@ -118,6 +118,47 @@ const Page = () => {
       pending: {
         render() {
           return "Deleting...";
+        },
+      },
+      success: {
+        render({ data }) {
+          return `${data}`;
+        },
+      },
+      error: {
+        render({ data }) {
+          // When the promise reject, data will contains the error
+          return `${data}`;
+        },
+      },
+    });
+  };
+
+  const changeStatus = (id, status) => {
+    const resolveWithSomeData = new Promise(async (resolve, reject) => {
+      await UpdateUser(id, {
+        isActive: status,
+      })
+        .then((res) => {
+          if (res.data.success) {
+            resolve(res.data.message);
+            setLoaded(false);
+          } else {
+            reject(res.data.message);
+          }
+        })
+        .catch((err) => {
+          if (err.response?.data?.message) {
+            return reject(err.response?.data?.message);
+          }
+          reject(err.message);
+        });
+    });
+
+    toast.promise(resolveWithSomeData, {
+      pending: {
+        render() {
+          return "Saving...";
         },
       },
       success: {
@@ -242,7 +283,10 @@ const Page = () => {
                       }
                     </td>
                     <td align="center">
-                      <GetActiveLabel status={item?.isActive} />
+                      <GetActiveLabel
+                        status={item?.isActive}
+                        onClick={() => changeStatus(item._id, !item.isActive)}
+                      />
                     </td>
                     <td align="center">
                       <Tooltip arrow title="Edit">

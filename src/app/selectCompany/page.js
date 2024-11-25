@@ -1,5 +1,4 @@
 "use client";
-import CreateCompany from "@/components/modals/CreateCompanyModal";
 import { Button } from "@nextui-org/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -21,11 +20,13 @@ const SelectCompany = () => {
               alt="Logo"
             />
             <div className="flex gap-3">
-             <Button className="text-default bg-white border-default border font-medium" onClick={()=>router.push('/adminDashboard')}>
-        Admin Dashboard
-      </Button>
-            <CreateCompany />
-      </div>
+              <Button
+                className="text-white bg-default font-medium"
+                onClick={() => router.push("/adminDashboard")}
+              >
+                Admin Dashboard
+              </Button>
+            </div>
           </div>
           <div>
             <h2 className="text-4xl font-semibold text-default flex items-center justify-center gap-2">

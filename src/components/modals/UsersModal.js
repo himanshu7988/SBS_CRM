@@ -12,7 +12,7 @@ import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import MyInput from "../common/Input";
 import { roleSchema } from "@/models/RoleSchemas";
-import { CreateUser, UpdateUser } from "@/config/Api";
+import { CreateUser, UpdateUser, UpdateUserPassword } from "@/config/Api";
 import { toast } from "react-toastify";
 import {
   usersResetPassSchema,
@@ -137,15 +137,12 @@ export default function UsersModal({
             });
         }
         if (formFor == "resetPass") {
-          await UpdateUser(currentData._id, {
-            name: values.name,
-            email: values.email,
-            userType: values.userType.value,
+          await UpdateUserPassword(currentData._id, {
+            password: values.password,
           })
             .then((res) => {
               if (res.data.success) {
                 resolve(res.data.message);
-                setLoaded(false);
                 onClose();
               } else {
                 reject(res.data.message);
