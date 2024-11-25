@@ -8,11 +8,13 @@ import { MdLogout } from "react-icons/md";
 import { MdMessage } from "react-icons/md";
 import { TbReportSearch } from "react-icons/tb";
 import { IoHelpCircleSharp } from "react-icons/io5";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { TiArrowBack } from "react-icons/ti";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const pathname = usePathname();
+  const searchPramas = useSearchParams();
+  const financialYear = searchPramas.get("financialYear");
 
   return (
     <section
@@ -43,7 +45,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         <ul className="flex flex-col gap-4 ">
           <li>
             <Link
-              href="/dashboard"
+              href={`/dashboard?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer 
                 ${
@@ -57,7 +59,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/companies"
+              href={`/dashboard/companies?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/companies") &&
@@ -70,7 +72,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/deals"
+              href={`/dashboard/deals?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/deals") &&
@@ -83,7 +85,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/contact"
+              href={`/dashboard/contact?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/contact") &&
@@ -96,7 +98,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/reports"
+              href={`/dashboard/reports?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/reports") &&
@@ -109,7 +111,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/messages"
+              href={`/dashboard/messages?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/messages") &&
@@ -122,7 +124,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/help"
+              href={`/dashboard/help?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 mb-6 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/help") &&

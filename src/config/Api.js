@@ -38,6 +38,9 @@ export const GetRoleList = async (data) => {
 export const GetCompanyList = async (data) => {
   return await apiClient.get(`${BASE_URL}admin/GetCompanyList?page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}`);
 };
+export const GetCompanyListFinancialYear = async (data) => {
+  return await apiClient.get(`${BASE_URL}admin/GetCompanyListFinancialYear?financialYear=${data?.financialYear}`);
+};
 export const GetUsersList = async (data) => {
   return await apiClient.get(`${BASE_URL}admin/GetUsersList?page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}`);
 };

@@ -8,6 +8,7 @@ import AdminSidebar from "../AdminSidebar";
 const DefaultLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+
   return (
     <>
       <div className="flex h-screen overflow-hidden">
