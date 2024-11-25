@@ -22,9 +22,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex flex-col justify-center items-start ">
-        <div className="text-white flex w-full justify-end px-6 pt-3">
+        <Link
+          href="/selectCompany"
+          className="text-white flex w-full justify-end px-6 pt-3"
+        >
           <TiArrowBack fontSize={25} className="cursor-pointer" />
-        </div>
+        </Link>
         <Link href="/dashboard" className="flex gap-2 py-6 md:px-6 px-4">
           <Image
             width={176}
