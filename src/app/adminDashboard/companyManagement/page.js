@@ -15,7 +15,7 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
-import { DeleteUser, GetCompanyList, UpdateUser } from "@/config/Api";
+import { DeleteCompany, GetCompanyList, UpdateUser } from "@/config/Api";
 import { toast } from "react-toastify";
 import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
@@ -33,7 +33,7 @@ const headCells = [
     numeric: false,
   },
   {
-    label: "Started",
+    label: "FY's",
     // align: "center",
     numeric: false,
   },
@@ -107,7 +107,7 @@ const Page = () => {
 
   const deleteData = async (id) => {
     const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await DeleteUser(id)
+      await DeleteCompany(id)
         .then((res) => {
           if (res.data.success) {
             resolve(res.data.message);
@@ -285,7 +285,14 @@ const Page = () => {
                   <tr key={i}>
                     <td align="left">{i + 1 + rowsPerPage * page}</td>
                     <td align="left">{item?.companyName}</td>
-                    <td align="left">{item?.beginYear}</td>
+                    <td align="left">
+                      {item?.financialYears?.[0].financialYear.split("-")?.[0]}-
+                      {
+                        item?.financialYears?.[
+                          item?.financialYears.length - 1
+                        ].financialYear.split("-")?.[1]
+                      }
+                    </td>
                     <td align="left">{item?.email}</td>
                     <td align="left">{item?.pan}</td>
                     <td align="left">{item?.gst}</td>
@@ -314,7 +321,7 @@ const Page = () => {
                           />
                         </IconButton>
                       </Tooltip>
-                      <Dropdown>
+                      {/* <Dropdown>
                         <DropdownTrigger>
                           <Tooltip arrow title="Delete">
                             <IconButton variant="bordered">
@@ -337,7 +344,7 @@ const Page = () => {
                             Reset Password
                           </DropdownItem>
                         </DropdownMenu>
-                      </Dropdown>
+                      </Dropdown> */}
                     </td>
                   </tr>
                 ))}

@@ -65,7 +65,7 @@ export default function CompanyModal({
       formik.setSubmitting(true);
       const resolveWithSomeData = new Promise(async (resolve, reject) => {
         if (formFor == "Add") {
-          await CreateCompany(values)
+          await CreateCompany({...values,beginYear:dayjs(values.beginYear).format('YYYY')})
             .then((res) => {
               if (res.data.success) {
                 resolve(res.data.message);
@@ -134,7 +134,7 @@ export default function CompanyModal({
       formik.resetForm();
     }
     if (formFor == "Update") {
-      formik.setValues(currentData);
+      formik.setValues({...currentData,beginYear:dayjs(currentData?.beginYear)});
     }
   }, [isOpen]);
 

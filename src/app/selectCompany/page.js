@@ -2,11 +2,16 @@
 import { Button } from "@nextui-org/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 import { FaHandPointDown } from "react-icons/fa";
 
 const SelectCompany = () => {
   const router = useRouter();
+
+
+  useEffect(()=>{
+    getData()
+  },[])
 
   return (
     <>

@@ -73,3 +73,6 @@ export const DeleteRole = async (id) => {
 export const DeleteUser = async (id) => {
   return await apiClient.delete(`${BASE_URL}admin/DeleteUser?_id=${id}`);
 };
+export const DeleteCompany = async (id) => {
+  return await apiClient.delete(`${BASE_URL}admin/DeleteCompany?_id=${id}`);
+};

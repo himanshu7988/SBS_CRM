@@ -55,7 +55,7 @@ export const createCompanySchema = Yup.object().shape({
   //   .max(9999, "Year must not exceed four digits")
   //   .required("Year is required"),
 
-  billingAaddress: Yup.string()
+  billingAddress: Yup.string()
     .min(5, "Address is too short")
     .max(200, "Address is too long")
     .required("Address is required"),
