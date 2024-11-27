@@ -203,9 +203,9 @@ const Page = () => {
               {Boolean(!loading && visibleRows.length && error == "") &&
                 visibleRows.map((item, i) => (
                   <tr key={i}>
-                    <td align="left">{i + 1 + rowsPerPage * page}</td>
+                    <td align="left" className="whitespace-nowrap">{i + 1 + rowsPerPage * page}</td>
                     <td align="left">{item?.roleName}</td>
-                    <td align="center">
+                    <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">
                         <IconButton
                           size="small"

@@ -283,9 +283,9 @@ const Page = () => {
               {!loading &&
                 visibleRows.map((item, i) => (
                   <tr key={i}>
-                    <td align="left">{i + 1 + rowsPerPage * page}</td>
+                    <td align="left" className="whitespace-nowrap">{i + 1 + rowsPerPage * page}</td>
                     <td align="left">{item?.companyName}</td>
-                    <td align="left">
+                    <td align="left" className="whitespace-nowrap">
                       {item?.financialYears?.[0].financialYear.split("-")?.[0]}-
                       {
                         item?.financialYears?.[
@@ -293,11 +293,11 @@ const Page = () => {
                         ].financialYear.split("-")?.[1]
                       }
                     </td>
-                    <td align="left">{item?.email}</td>
-                    <td align="left">{item?.pan}</td>
-                    <td align="left">{item?.gst}</td>
+                    <td align="left" className="whitespace-nowrap">{item?.email}</td>
+                    <td align="left" className="whitespace-nowrap">{item?.pan}</td>
+                    <td align="left" className="whitespace-nowrap">{item?.gst}</td>
                     <td align="left">{item?.billingAddress}</td>
-                    <td align="center">
+                    <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">
                         <IconButton
                           size="small"
