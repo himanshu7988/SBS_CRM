@@ -15,12 +15,7 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
-import {
-  DeleteCompany,
-  GetCompanyList,
-  GetLedgerList,
-  UpdateUser,
-} from "@/config/Api";
+import { DeleteLedger, GetLedgerList } from "@/config/Api";
 import { toast } from "react-toastify";
 import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
@@ -110,7 +105,7 @@ const Page = () => {
 
   const deleteData = async (id) => {
     const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await DeleteCompany(id)
+      await DeleteLedger(id)
         .then((res) => {
           if (res.data.success) {
             resolve(res.data.message);
@@ -131,47 +126,6 @@ const Page = () => {
       pending: {
         render() {
           return "Deleting...";
-        },
-      },
-      success: {
-        render({ data }) {
-          return `${data}`;
-        },
-      },
-      error: {
-        render({ data }) {
-          // When the promise reject, data will contains the error
-          return `${data}`;
-        },
-      },
-    });
-  };
-
-  const changeStatus = (id, status) => {
-    const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await UpdateUser(id, {
-        isActive: status,
-      })
-        .then((res) => {
-          if (res.data.success) {
-            resolve(res.data.message);
-            setLoaded(false);
-          } else {
-            reject(res.data.message);
-          }
-        })
-        .catch((err) => {
-          if (err.response?.data?.message) {
-            return reject(err.response?.data?.message);
-          }
-          reject(err.message);
-        });
-    });
-
-    toast.promise(resolveWithSomeData, {
-      pending: {
-        render() {
-          return "Saving...";
         },
       },
       success: {
@@ -287,11 +241,17 @@ const Page = () => {
               {!loading &&
                 visibleRows.map((item, i) => (
                   <tr key={i}>
-                    <td align="left" className="whitespace-nowrap">{i + 1 + rowsPerPage * page}</td>
+                    <td align="left" className="whitespace-nowrap">
+                      {i + 1 + rowsPerPage * page}
+                    </td>
                     <td align="left">{item?.companyName}</td>
                     <td align="left">{item?.email}</td>
-                    <td align="left" className="whitespace-nowrap">{item?.gst}</td>
-                    <td align="left" className="whitespace-nowrap">{item?.pan}</td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.gst}
+                    </td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.pan}
+                    </td>
                     <td align="left">
                       {item?.addressLine1} {item?.addressLine2}{" "}
                       {item?.city?.name} {item?.state?.name}{" "}
