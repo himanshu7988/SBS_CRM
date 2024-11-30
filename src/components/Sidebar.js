@@ -59,15 +59,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href={`/dashboard/companies?financialYear=${financialYear}`}
+              href={`/dashboard/ledgers?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/companies") &&
+                pathname.includes("/dashboard/ledgers") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
               <FaUsers fontSize={25} />
-              Companies
+              Ledgers
             </Link>
           </li>
           <li>
