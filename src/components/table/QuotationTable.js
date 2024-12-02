@@ -21,7 +21,6 @@ import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
 import { MdMoreVert } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 const headCells = [
   {
@@ -61,7 +60,7 @@ const headCells = [
   },
 ];
 
-const Page = () => {
+const QuotationTable = () => {
   const [page, setPage] = React.useState(0);
   const [totalRecords, setTotalRecords] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -75,6 +74,25 @@ const Page = () => {
   const [searchData, setSearchData] = useState("");
   const searchPramas = useSearchParams();
   const financialYear = searchPramas.get("financialYear");
+
+  const onOpen = () => {
+    setIsOpenAdd(true);
+  };
+  const onEdit = (row) => {
+    setFormFor("Update");
+    setCurrentData(row);
+    setIsOpenAdd(true);
+  };
+  const onReset = (row) => {
+    setFormFor("resetPass");
+    setCurrentData(row);
+    setIsOpenAdd(true);
+  };
+  const onClose = () => {
+    setFormFor("Add");
+    setCurrentData(null);
+    setIsOpenAdd(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -169,38 +187,20 @@ const Page = () => {
 
   return (
     <>
-      <div className="w-full shadow-md">
-        <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
-          <h3 className="text-lg md:text-2xl font-semibold text-default ">
-            Deals
-          </h3>
+      <div className="w-full">
+        <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg">
+            <p className="font-semibold">Quotation Items</p>
           <div className="flex items-center gap-1 md:gap-4">
             {/* <div className="bg-gray-100 rounded-full p-2 cursor-pointer"> */}
             <Tooltip content="Add Contact">
-              <Link href={`deals/add?financialYear=${financialYear}`}>
-                <IconButton>
-                  <FaPlus fontSize={20} />
-                </IconButton>
-              </Link>
+              <IconButton onClick={onOpen}>
+                <FaPlus fontSize={20} />
+              </IconButton>
             </Tooltip>
             {/* </div> */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search"
-                className="px-8 md:px-12 py-1 md:py-3 w-40 md:w-[17rem] rounded-[2rem] focus:outline-none border-none bg-gray-100"
-                value={searchData}
-                onChange={(e) => {
-                  setSearchData(e.target.value);
-                  // handleSearch(e.target.value);
-                }}
-              />
-              <span className="absolute top-1/2 left-1 p-1 md:p-2 rounded-full bg-purple-300 -translate-y-1/2">
-                <IoIosSearch className="text-md md:text-xl" />
-              </span>
-            </div>
           </div>
         </div>
+        <hr className="col-span-2" />
         <div className="overflow-x-auto scroll-my-1 w-full">
           <table className="w-full">
             <thead>
@@ -328,8 +328,15 @@ const Page = () => {
           />
         </div>
       </div>
+      <AddContactModal
+        formFor={formFor}
+        currentData={currentData}
+        isOpen={isOpenAdd}
+        onClose={onClose}
+        setLoaded={setLoaded}
+      />
     </>
   );
 };
 
-export default Page;
+export default QuotationTable;

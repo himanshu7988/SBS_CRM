@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { usePathname } from "next/navigation";
 import AdminSidebar from "../AdminSidebar";
+import BreadCrumb from "../BreadCrumbs";
 
 const DefaultLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -28,8 +29,11 @@ const DefaultLayout = ({ children }) => {
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
           {/* Main Content */}
-          <main className="">
-            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+          <main>
+            <div className="mx-auto max-w-screen-2xl px-4 md:px-6 2xl:px-10 pt-2">
+              <BreadCrumb />
+            </div>
+            <div className="mx-auto max-w-screen-2xl px-4 md:px-6 2xl:px-10 pt-4">
               {children}
             </div>
           </main>
