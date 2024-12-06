@@ -2,26 +2,15 @@
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import AddContactModal from "@/components/modals/AddContactModal";
+import RoleModal from "@/components/modals/RoleModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { FaPlus } from "react-icons/fa6";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Skeleton,
-  Spinner,
-} from "@nextui-org/react";
-import { DeleteLedger, GetLedgerList } from "@/config/Api";
+import { Skeleton, Spinner } from "@nextui-org/react";
+import { DeleteRole, GetRoleList } from "@/config/Api";
 import { toast } from "react-toastify";
-import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
-import { MdMoreVert } from "react-icons/md";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 const headCells = [
   {
@@ -30,27 +19,7 @@ const headCells = [
     numeric: false,
   },
   {
-    label: "Name",
-    //   align:"left",
-    numeric: false,
-  },
-  {
-    label: "Email",
-    //   align:"right",
-    numeric: false,
-  },
-  {
-    label: "GST",
-    //   align:"left",
-    numeric: false,
-  },
-  {
-    label: "PAN",
-    //   align:"left",
-    numeric: false,
-  },
-  {
-    label: "Address",
+    label: "Role Name",
     //   align:"left",
     numeric: false,
   },
@@ -73,8 +42,20 @@ const Page = () => {
   const [error, setError] = React.useState("");
   const [visibleRows, setVisibleRows] = useState([]);
   const [searchData, setSearchData] = useState("");
-  const searchPramas = useSearchParams();
-  const financialYear = searchPramas.get("financialYear");
+
+  const onOpen = () => {
+    setIsOpenAdd(true);
+  };
+  const onEdit = (row) => {
+    setFormFor("Update");
+    setCurrentData(row);
+    setIsOpenAdd(true);
+  };
+  const onClose = () => {
+    setFormFor("Add");
+    setCurrentData(null);
+    setIsOpenAdd(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -87,7 +68,7 @@ const Page = () => {
 
   const deleteData = async (id) => {
     const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await DeleteLedger(id)
+      await DeleteRole(id)
         .then((res) => {
           if (res.data.success) {
             resolve(res.data.message);
@@ -127,8 +108,7 @@ const Page = () => {
   const getData = async (text) => {
     setError("");
     setLoading(true);
-    await GetLedgerList({
-      financialYear: financialYear,
+    await GetRoleList({
       page: page + 1,
       pageSize: rowsPerPage,
       search: text ? text : searchData,
@@ -172,16 +152,14 @@ const Page = () => {
       <div className="w-full shadow-md">
         <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
           <h3 className="text-lg md:text-2xl font-semibold text-default ">
-            Deals
+            Roles
           </h3>
           <div className="flex items-center gap-1 md:gap-4">
             {/* <div className="bg-gray-100 rounded-full p-2 cursor-pointer"> */}
             <Tooltip content="Add Contact">
-              <Link href={`deals/add?financialYear=${financialYear}`}>
-                <IconButton>
-                  <FaPlus fontSize={20} />
-                </IconButton>
-              </Link>
+              <IconButton onClick={onOpen}>
+                <FaPlus fontSize={20} />
+              </IconButton>
             </Tooltip>
             {/* </div> */}
             <div className="relative">
@@ -222,25 +200,11 @@ const Page = () => {
               </tr>
             </thead>
             <tbody>
-              {!loading &&
+              {Boolean(!loading && visibleRows.length && error == "") &&
                 visibleRows.map((item, i) => (
                   <tr key={i}>
-                    <td align="left" className="whitespace-nowrap">
-                      {i + 1 + rowsPerPage * page}
-                    </td>
-                    <td align="left">{item?.companyName}</td>
-                    <td align="left">{item?.email}</td>
-                    <td align="left" className="whitespace-nowrap">
-                      {item?.gst}
-                    </td>
-                    <td align="left" className="whitespace-nowrap">
-                      {item?.pan}
-                    </td>
-                    <td align="left">
-                      {item?.addressLine1} {item?.addressLine2}{" "}
-                      {item?.city?.name} {item?.state?.name}{" "}
-                      {item?.country?.name}
-                    </td>
+                    <td align="left" className="whitespace-nowrap">{i + 1 + rowsPerPage * page}</td>
+                    <td align="left">{item?.roleName}</td>
                     <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">
                         <IconButton
@@ -265,30 +229,6 @@ const Page = () => {
                           />
                         </IconButton>
                       </Tooltip>
-                      {/* <Dropdown>
-                        <DropdownTrigger>
-                          <Tooltip arrow title="Delete">
-                            <IconButton variant="bordered">
-                              <MdMoreVert />
-                            </IconButton>
-                          </Tooltip>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                          variant="faded"
-                          aria-label="Dropdown menu with icons"
-                        >
-                          <DropdownItem
-                            key="new"
-                            // shortcut="⌘N"
-                            // startContent={<AddNoteIcon className={iconClasses} />}
-                            onClick={() => {
-                              onReset(item);
-                            }}
-                          >
-                            Reset Password
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </Dropdown> */}
                     </td>
                   </tr>
                 ))}
@@ -296,10 +236,10 @@ const Page = () => {
           </table>
         </div>
         {loading && (
-          <p className="justify-center text-xl font-semibold py-10 bg-white flex gap-3">
+          <div className="justify-center text-xl font-semibold py-10 bg-white flex gap-3">
             <Spinner color="secondary" />
             Loading.....
-          </p>
+          </div>
         )}
         {!loading && !visibleRows.length && error == "" && (
           <p className="justify-center text-xl font-semibold py-10 bg-white flex gap-3">
@@ -328,6 +268,13 @@ const Page = () => {
           />
         </div>
       </div>
+      <RoleModal
+        formFor={formFor}
+        currentData={currentData}
+        isOpen={isOpenAdd}
+        onClose={onClose}
+        setLoaded={setLoaded}
+      />
     </>
   );
 };

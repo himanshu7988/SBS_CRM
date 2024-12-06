@@ -2,19 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { BiSolidDashboard } from "react-icons/bi";
-import { FaHandshake, FaRegCircleUser } from "react-icons/fa6";
+import { FaHandshake, FaRegCircleUser, FaUsersGear } from "react-icons/fa6";
+import { TiArrowBack } from "react-icons/ti";
 import { FaUsers } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
-import { MdMessage } from "react-icons/md";
-import { TbReportSearch } from "react-icons/tb";
-import { IoHelpCircleSharp } from "react-icons/io5";
-import { usePathname, useSearchParams } from "next/navigation";
-import { TiArrowBack } from "react-icons/ti";
+import { VscBriefcase } from "react-icons/vsc";
+// import { MdMessage } from "react-icons/md";
+// import { TbReportSearch } from "react-icons/tb";
+// import { IoHelpCircleSharp } from "react-icons/io5";
+import { usePathname } from "next/navigation";
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const pathname = usePathname();
-  const searchPramas = useSearchParams();
-  const financialYear = searchPramas.get("financialYear");
 
   return (
     <section
@@ -45,11 +44,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         <ul className="flex flex-col gap-4 ">
           <li>
             <Link
-              href={`/dashboard?financialYear=${financialYear}`}
+              href="/adminDashboard"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer 
                 ${
-                  (pathname === "/" || pathname === "/dashboard") &&
+                  (pathname === "/" || pathname === "/adminDashboard") &&
                   "text-yellow-400 border-r-4 border-yellow-400"
                 }`}
             >
@@ -59,46 +58,46 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href={`/dashboard/ledgers?financialYear=${financialYear}`}
+              href="/adminDashboard/companyManagement"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/ledgers") &&
+                pathname.includes("/adminDashboard/companyManagement") &&
+                "text-yellow-400 border-r-4 border-yellow-400"
+              }`}
+            >
+              <VscBriefcase fontSize={25} />
+              Companies
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/adminDashboard/users"
+              onClick={() => setSidebarOpen(false)}
+              className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
+                pathname.includes("/adminDashboard/users") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
               <FaUsers fontSize={25} />
-              Ledgers
+              Users
             </Link>
           </li>
           <li>
             <Link
-              href={`/dashboard/deals?financialYear=${financialYear}`}
+              href="/adminDashboard/roles"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/deals") &&
+                pathname.includes("/adminDashboard/roles") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
-              <FaHandshake fontSize={25} />
-              Deals
+              <FaUsersGear fontSize={25} />
+              Roles
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
-              href={`/dashboard/contact?financialYear=${financialYear}`}
-              onClick={() => setSidebarOpen(false)}
-              className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/contact") &&
-                "text-yellow-400 border-r-4 border-yellow-400"
-              }`}
-            >
-              <FaRegCircleUser fontSize={25} />
-              Contacts
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={`/dashboard/reports?financialYear=${financialYear}`}
+              href="/dashboard/reports"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/reports") &&
@@ -111,7 +110,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href={`/dashboard/messages?financialYear=${financialYear}`}
+              href="/dashboard/messages"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/messages") &&
@@ -124,7 +123,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href={`/dashboard/help?financialYear=${financialYear}`}
+              href="/dashboard/help"
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 mb-6 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/help") &&
@@ -134,7 +133,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               <IoHelpCircleSharp fontSize={27} />
               Help
             </Link>
-          </li>
+          </li> */}
         </ul>
 
         <ul>
@@ -157,4 +156,4 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   );
 };
 
-export default Sidebar;
+export default AdminSidebar;

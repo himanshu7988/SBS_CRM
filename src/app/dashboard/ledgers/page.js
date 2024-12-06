@@ -21,7 +21,6 @@ import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
 import { MdMoreVert } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 const headCells = [
   {
@@ -75,6 +74,25 @@ const Page = () => {
   const [searchData, setSearchData] = useState("");
   const searchPramas = useSearchParams();
   const financialYear = searchPramas.get("financialYear");
+
+  const onOpen = () => {
+    setIsOpenAdd(true);
+  };
+  const onEdit = (row) => {
+    setFormFor("Update");
+    setCurrentData(row);
+    setIsOpenAdd(true);
+  };
+  const onReset = (row) => {
+    setFormFor("resetPass");
+    setCurrentData(row);
+    setIsOpenAdd(true);
+  };
+  const onClose = () => {
+    setFormFor("Add");
+    setCurrentData(null);
+    setIsOpenAdd(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -172,16 +190,14 @@ const Page = () => {
       <div className="w-full shadow-md">
         <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
           <h3 className="text-lg md:text-2xl font-semibold text-default ">
-            Deals
+            Ledgers
           </h3>
           <div className="flex items-center gap-1 md:gap-4">
             {/* <div className="bg-gray-100 rounded-full p-2 cursor-pointer"> */}
             <Tooltip content="Add Contact">
-              <Link href={`deals/add?financialYear=${financialYear}`}>
-                <IconButton>
-                  <FaPlus fontSize={20} />
-                </IconButton>
-              </Link>
+              <IconButton onClick={onOpen}>
+                <FaPlus fontSize={20} />
+              </IconButton>
             </Tooltip>
             {/* </div> */}
             <div className="relative">
@@ -328,6 +344,13 @@ const Page = () => {
           />
         </div>
       </div>
+      <AddContactModal
+        formFor={formFor}
+        currentData={currentData}
+        isOpen={isOpenAdd}
+        onClose={onClose}
+        setLoaded={setLoaded}
+      />
     </>
   );
 };
