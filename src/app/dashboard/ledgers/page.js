@@ -2,7 +2,7 @@
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import AddContactModal from "@/components/modals/AddContactModal";
+import AddLedgerModal from "@/components/modals/AddLedgerModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,6 +21,7 @@ import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
 import { MdMoreVert } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
+import ContactListModal from "@/components/modals/contact/ContactListModal";
 
 const headCells = [
   {
@@ -67,6 +68,7 @@ const Page = () => {
   const [formFor, setFormFor] = React.useState("Add");
   const [currentData, setCurrentData] = React.useState(null);
   const [isOpenAdd, setIsOpenAdd] = React.useState(false);
+  const [isOpenContact, setIsOpenContact] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -92,6 +94,15 @@ const Page = () => {
     setFormFor("Add");
     setCurrentData(null);
     setIsOpenAdd(false);
+  };
+
+  const onOpenContact = (row) => {
+    setCurrentData(row);
+    setIsOpenContact(true);
+  };
+  const onCloseContact = () => {
+    setCurrentData(null);
+    setIsOpenContact(false);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -281,7 +292,7 @@ const Page = () => {
                           />
                         </IconButton>
                       </Tooltip>
-                      {/* <Dropdown>
+                      <Dropdown>
                         <DropdownTrigger>
                           <Tooltip arrow title="Delete">
                             <IconButton variant="bordered">
@@ -298,13 +309,13 @@ const Page = () => {
                             // shortcut="⌘N"
                             // startContent={<AddNoteIcon className={iconClasses} />}
                             onClick={() => {
-                              onReset(item);
+                              onOpenContact(item);
                             }}
                           >
-                            Reset Password
+                            Contacts
                           </DropdownItem>
                         </DropdownMenu>
-                      </Dropdown> */}
+                      </Dropdown>
                     </td>
                   </tr>
                 ))}
@@ -344,12 +355,17 @@ const Page = () => {
           />
         </div>
       </div>
-      <AddContactModal
+      <AddLedgerModal
         formFor={formFor}
         currentData={currentData}
         isOpen={isOpenAdd}
         onClose={onClose}
         setLoaded={setLoaded}
+      />
+      <ContactListModal
+        currentData={currentData}
+        isOpen={isOpenContact}
+        onClose={onCloseContact}
       />
     </>
   );

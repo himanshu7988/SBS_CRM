@@ -2,7 +2,7 @@
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import AddContactModal from "@/components/modals/AddContactModal";
+import AddContactModal from "@/components/modals/AddLedgerModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -29,29 +29,24 @@ const headCells = [
     numeric: false,
   },
   {
-    label: "Name",
+    label: "Item/Service Description",
     //   align:"left",
     numeric: false,
   },
   {
-    label: "Email",
+    label: "Quantity",
     //   align:"right",
-    numeric: false,
+    numeric: true,
   },
   {
-    label: "GST",
+    label: "Unit Price",
     //   align:"left",
-    numeric: false,
+    numeric: true,
   },
   {
-    label: "PAN",
+    label: "Total",
     //   align:"left",
-    numeric: false,
-  },
-  {
-    label: "Address",
-    //   align:"left",
-    numeric: false,
+    numeric: true,
   },
   {
     label: "Action",
@@ -188,8 +183,8 @@ const QuotationTable = () => {
   return (
     <>
       <div className="w-full">
-        <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg">
-            <p className="font-semibold">Quotation Items</p>
+        <div className=" py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg">
+          <p className="font-semibold">Quotation Items</p>
           <div className="flex items-center gap-1 md:gap-4">
             {/* <div className="bg-gray-100 rounded-full p-2 cursor-pointer"> */}
             <Tooltip content="Add Contact">
@@ -229,17 +224,12 @@ const QuotationTable = () => {
                       {i + 1 + rowsPerPage * page}
                     </td>
                     <td align="left">{item?.companyName}</td>
-                    <td align="left">{item?.email}</td>
-                    <td align="left" className="whitespace-nowrap">
+                    <td align="right">{item?.email}</td>
+                    <td align="right" className="whitespace-nowrap">
                       {item?.gst}
                     </td>
-                    <td align="left" className="whitespace-nowrap">
+                    <td align="right" className="whitespace-nowrap">
                       {item?.pan}
-                    </td>
-                    <td align="left">
-                      {item?.addressLine1} {item?.addressLine2}{" "}
-                      {item?.city?.name} {item?.state?.name}{" "}
-                      {item?.country?.name}
                     </td>
                     <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">

@@ -56,6 +56,12 @@ export const GetUsersList = async (data) => {
 export const GetLedgerList = async (data) => {
   return await apiClient.get(`${BASE_URL}user/GetLedgerList?financialYear=${data?.financialYear}&page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}`);
 };
+export const GetContactListFull = async (data) => {
+  return await apiClient.get(`${BASE_URL}user/GetContactListFull?financialYear=${data?.financialYear}&page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}`);
+};
+export const GetContactList = async (data) => {
+  return await apiClient.get(`${BASE_URL}user/GetContactList?financialYear=${data?.financialYear}&page=${data?.page}&pageSize=${data?.pageSize}&search=${data?.search}&ledger=${data?.ledger}`);
+};
 export const login = async (data) => {
   return await axios.post(`${BASE_URL}admin/login`, data, {
     withCredentials: true, // Ensures cookies are sent/received
@@ -73,6 +79,9 @@ export const CreateUser = async (data) => {
 export const CreateLeader = async (data) => {
   return await apiClient.post(`${BASE_URL}user/CreateLeader`, data);
 };
+export const CreateContact = async (data) => {
+  return await apiClient.post(`${BASE_URL}user/CreateContact`, data);
+};
 export const UpdateRole = async (id,data) => {
   return await apiClient.patch(`${BASE_URL}admin/UpdateRole?_id=${id}`, data);
 };
@@ -87,6 +96,9 @@ export const UpdateUserPassword = async (id,data) => {
 };
 export const UpdateLedger = async (id,data) => {
   return await apiClient.patch(`${BASE_URL}user/UpdateLedger?_id=${id}`, data);
+};
+export const UpdateContact = async (id,data) => {
+  return await apiClient.patch(`${BASE_URL}user/UpdateContact?_id=${id}`, data);
 };
 export const DeleteRole = async (id) => {
   return await apiClient.delete(`${BASE_URL}admin/DeleteRole?_id=${id}`);
