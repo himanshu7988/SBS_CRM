@@ -3,9 +3,7 @@
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
 import { IoIosSearch } from "react-icons/io";
-import {
-  Spinner,
-} from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 import { DeleteLedger, GetContactListFull } from "@/config/Api";
 import { toast } from "react-toastify";
 import { debounce } from "lodash";

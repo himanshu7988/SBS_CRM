@@ -14,9 +14,8 @@ import MyInput from "../common/Input";
 import { CreateCompany, UpdateCompany } from "@/config/Api";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createCompanySchema } from "@/models/ValidationSchemas";
+import DateInput from "@/components/common/DateInput";
 
 const initialValues = {
   companyName: "",
@@ -65,7 +64,10 @@ export default function CompanyModal({
       formik.setSubmitting(true);
       const resolveWithSomeData = new Promise(async (resolve, reject) => {
         if (formFor == "Add") {
-          await CreateCompany({...values,beginYear:dayjs(values.beginYear).format('YYYY')})
+          await CreateCompany({
+            ...values,
+            beginYear: dayjs(values.beginYear).format("YYYY"),
+          })
             .then((res) => {
               if (res.data.success) {
                 resolve(res.data.message);
@@ -134,7 +136,10 @@ export default function CompanyModal({
       formik.resetForm();
     }
     if (formFor == "Update") {
-      formik.setValues({...currentData,beginYear:dayjs(currentData?.beginYear)});
+      formik.setValues({
+        ...currentData,
+        beginYear: dayjs(currentData?.beginYear),
+      });
     }
   }, [isOpen]);
 
@@ -243,38 +248,23 @@ export default function CompanyModal({
                   />
                 </div>
                 <div className="mt-1">
-                  <label
-                    htmlFor="beginYear"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    BeginYear
-                  </label>
-                  <div className="mt-1">
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker
-                        className="w-full"
-                        value={formik.values.beginYear}
-                        onChange={(newValue) =>
-                          formik.setFieldValue("beginYear", newValue)
-                        }
-                        maxDate={dayjs()}
-                        openTo="year"
-                        views={["year"]}
-                        onBlur={formik.handleBlur}
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            helperText: formik.touched.beginYear
-                              ? formik.errors.beginYear
-                              : "",
-                            error: formik.touched.beginYear
-                              ? Boolean(formik.errors.beginYear)
-                              : false,
-                          },
-                        }}
-                      />
-                    </LocalizationProvider>
-                  </div>
+                  <DateInput
+                    label="BeginYear"
+                    value={formik.values.beginYear}
+                    onChange={(newValue) =>
+                      formik.setFieldValue("beginYear", newValue)
+                    }
+                    maxDate={dayjs()}
+                    openTo="year"
+                    views={["year"]}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.beginYear &&
+                      Boolean(formik.errors.beginYear)
+                        ? formik.errors.beginYear
+                        : ""
+                    }
+                  />
                 </div>
               </div>
               <div className="mt-1">

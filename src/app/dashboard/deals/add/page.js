@@ -4,16 +4,52 @@ import MyInput from "@/components/common/Input";
 import MyAutocomplete from "@/components/common/MyAutocomplete";
 import QuotationTable from "@/components/table/QuotationTable";
 import { addLedgerSchema } from "@/models/ValidationSchemas";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Button } from "@nextui-org/react";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import DateInput from "@/components/common/DateInput";
+import dayjs from "dayjs";
+import {
+  getCityList,
+  GetContactList,
+  getCountriesList,
+  GetLedgerList,
+  getStatesList,
+} from "@/config/Api";
+import { useSearchParams } from "next/navigation";
 
 const initialValues = {
-  // international: false,
+  quotationNo: "",
+  quotationDate: dayjs(),
+  company: null,
+  countryCompany: null,
+  stateCompany: null,
+  cityCompany: null,
+  addressLine1Company: "",
+  addressLine2Company: "",
+  countryClient: null,
+  stateClient: null,
+  cityClient: null,
+  addressLine1Client: "",
+  addressLine2Client: "",
+  contactCompany: null,
+  contactClient: null,
 };
 const Page = () => {
+  const [loaded, setLoaded] = useState(false);
   const [ledgerData, setLedgerData] = useState([]);
+  const [countryData, setCountryData] = useState([]);
+  const [stateDataCompany, setStateDataCompany] = useState([]);
+  const [stateDataClient, setStateDataClient] = useState([]);
+  const [cityDataCompany, setCityDataCompany] = useState([]);
+  const [cityDataClient, setCityDataClient] = useState([]);
+  const [contactDataCompany, setContactDataCompany] = useState([]);
+  const [contactDataClient, setContactDataClient] = useState([]);
+  const searchPramas = useSearchParams();
+  const financialYear = searchPramas.get("financialYear");
 
   const formik = useFormik({
     initialValues: initialValues,
@@ -70,6 +106,160 @@ const Page = () => {
     },
   });
 
+  const getData = async () => {
+    try {
+      const [resLedger, resCountry] = await Promise.all([
+        GetLedgerList({ financialYear, search: "" }),
+        getCountriesList(),
+      ]);
+      if (resLedger) {
+        setLedgerData(resLedger?.data?.data);
+      }
+      if (resCountry) {
+        setCountryData(resCountry?.data?.data);
+      }
+    } catch (error) {}
+  };
+
+  const getState = async (id, rFor) => {
+    try {
+      const resState = await getStatesList({ id });
+      if (resState) {
+        if (rFor == "Company") {
+          setStateDataCompany(resState?.data?.data);
+        } else {
+          setStateDataClient(resState?.data?.data);
+        }
+      }
+    } catch (error) {}
+  };
+  const getCity = async (id, rFor) => {
+    try {
+      const resCity = await getCityList({ id });
+      if (resCity) {
+        if (rFor == "Company") {
+          setCityDataCompany(resCity?.data?.data);
+        } else {
+          setCityDataClient(resCity?.data?.data);
+        }
+      }
+    } catch (error) {}
+  };
+  const getContact = async (id, rFor) => {
+    try {
+      const resContact = await GetContactList({
+        financialYear,
+        search: "",
+        ledger: id,
+      });
+      if (resContact) {
+        if (rFor == "Company") {
+          setContactDataCompany(resContact?.data?.data);
+        } else {
+          setContactDataClient(resContact?.data?.data);
+        }
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    if (!formik.values.company) {
+      setContactDataCompany([]);
+    } else {
+      getContact(formik.values.company?._id, "Company");
+    }
+  }, [formik.values.company]);
+  useEffect(() => {
+    if (!formik.values.client) {
+      setContactDataClient([]);
+    } else {
+      getContact(formik.values.client?._id, "Client");
+    }
+  }, [formik.values.client]);
+
+  useEffect(() => {
+    if (!formik.values.countryCompany) {
+      setStateDataCompany([]);
+      setCityDataCompany([]);
+    } else {
+      getState(formik.values.countryCompany?.id, "Company");
+    }
+  }, [formik.values.countryCompany]);
+  useEffect(() => {
+    if (!formik.values.countryClient) {
+      setStateDataClient([]);
+      setCityDataClient([]);
+    } else {
+      getState(formik.values.countryClient?.id, "Client");
+    }
+  }, [formik.values.countryClient]);
+
+  useEffect(() => {
+    if (!formik.values.stateCompany) {
+      setCityDataCompany([]);
+    } else {
+      getCity(formik.values.stateCompany?.id, "Company");
+    }
+  }, [formik.values.stateCompany]);
+  useEffect(() => {
+    if (!formik.values.stateClient) {
+      setCityDataClient([]);
+    } else {
+      getCity(formik.values.stateClient?.id, "Client");
+    }
+  }, [formik.values.stateClient]);
+
+  useEffect(() => {
+    if (formik.values.company) {
+      formik.setValues({
+        ...formik.values,
+        countryCompany: formik.values.company?.country,
+        stateCompany: formik.values.company?.state,
+        cityCompany: formik.values.company?.city,
+        addressLine1Company: formik.values.company?.addressLine1,
+        addressLine2Company: formik.values.company?.addressLine2,
+      });
+    } else {
+      formik.setValues({
+        ...formik.values,
+        countryCompany: null,
+        stateCompany: null,
+        cityCompany: null,
+        addressLine1Company: "",
+        addressLine2Company: "",
+      });
+    }
+  }, [formik.values.company]);
+
+  useEffect(() => {
+    if (formik.values.client) {
+      formik.setValues({
+        ...formik.values,
+        countryClient: formik.values.client?.country,
+        stateClient: formik.values.client?.state,
+        cityClient: formik.values.client?.city,
+        addressLine1Client: formik.values.client?.addressLine1,
+        addressLine2Client: formik.values.client?.addressLine2,
+      });
+    } else {
+      formik.setValues({
+        ...formik.values,
+        countryClient: null,
+        stateClient: null,
+        cityClient: null,
+        addressLine1Client: "",
+        addressLine2Client: "",
+      });
+    }
+  }, [formik.values.client]);
+
+  useEffect(() => {
+    if (!loaded) {
+      setLoaded(true);
+    }
+    getData();
+  }, [loaded]);
+
   return (
     <div className="grid grid-cols-2 gap-3 relative">
       <div className="col-span-2 bg-default py-2 px-5 !sticky top-20 md:top-24 z-10 flex justify-end">
@@ -111,27 +301,27 @@ const Page = () => {
             //     ? formik.errors.quotationNo
             //     : ""
             // }
+            disabled
           />
         </div>
         <div>
-          <MyInput
-            htmlFor="date"
-            id="date"
-            name="date"
-            type="text"
-            label="Date"
-            // onChange={formik.handleChange}
-            // value={formik.values.date}
-            // onBlur={formik.handleBlur}
-            // error={
-            //   formik.touched.date &&
-            //   formik.errors.date
-            //     ? formik.errors.date
-            //     : ""
-            // }
+          <DateInput
+            label="Quotation Date"
+            value={formik.values.beginYear}
+            onChange={(newValue) => formik.setFieldValue("beginYear", newValue)}
+            maxDate={dayjs()}
+            // openTo="year"
+            // views={["year"]}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.beginYear && Boolean(formik.errors.beginYear)
+                ? formik.errors.beginYear
+                : ""
+            }
+            disabled
           />
         </div>
-        <div>
+        {/* <div>
           <MyInput
             htmlFor="validUntil"
             id="validUntil"
@@ -148,21 +338,22 @@ const Page = () => {
             //     : ""
             // }
           />
-        </div>
+        </div> */}
       </div>
       <div className="grid bg-white py-5 px-5 rounded-xl shadow-lg grid-cols-2 gap-3">
         <div className="col-span-2 flex justify-between">
           <p className="font-semibold">Company Details</p>
           <p>
-            <span className="font-semibold">GST : </span>121212
+            <span className="font-semibold">GST : </span>{" "}
+            {formik.values?.company?.gst}
           </p>
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2">
           <MyAutocomplete
             label="Company"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            getOptionLabel={(option) => option?.name}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            getOptionLabel={(option) => option?.companyName}
             options={ledgerData}
             value={formik.values?.company}
             onChange={(e, newValue) => {
@@ -182,96 +373,110 @@ const Page = () => {
         <div className="">
           <MyAutocomplete
             label="Country"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
             getOptionLabel={(option) => option?.name}
-            options={ledgerData}
-            value={formik.values?.country}
+            options={countryData}
+            value={formik.values?.countryCompany}
             onChange={(e, newValue) => {
-              formik.setFieldValue("country", newValue);
+              formik.setValues({
+                ...formik.values,
+                countryCompany: newValue,
+                stateCompany: null,
+                cityCompany: null,
+              });
             }}
             error={
-              formik.touched.country && formik.errors.country
-                ? formik.errors.country
+              formik.touched.countryCompany && formik.errors.countryCompany
+                ? formik.errors.countryCompany
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "country",
+              name: "countryCompany",
             }}
           />
         </div>
         <div className="">
           <MyAutocomplete
             label="State/Provence"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
             getOptionLabel={(option) => option?.name}
-            options={ledgerData}
-            value={formik.values?.state}
+            options={stateDataCompany}
+            value={formik.values?.stateCompany}
             onChange={(e, newValue) => {
-              formik.setFieldValue("state", newValue);
+              formik.setValues({
+                ...formik.values,
+                stateCompany: newValue,
+                cityCompany: null,
+              });
             }}
             error={
-              formik.touched.state && formik.errors.state
-                ? formik.errors.state
+              formik.touched.stateCompany && formik.errors.stateCompany
+                ? formik.errors.stateCompany
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "state",
+              name: "stateCompany",
             }}
           />
         </div>
         <div className="">
           <MyAutocomplete
             label="City"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
             getOptionLabel={(option) => option?.name}
-            options={ledgerData}
-            value={formik.values?.city}
+            options={cityDataCompany}
+            value={formik.values?.cityCompany}
             onChange={(e, newValue) => {
-              formik.setFieldValue("city", newValue);
+              formik.setValues({
+                ...formik.values,
+                cityCompany: newValue,
+              });
             }}
             error={
-              formik.touched.city && formik.errors.city
-                ? formik.errors.city
+              formik.touched.cityCompany && formik.errors.cityCompany
+                ? formik.errors.cityCompany
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "city",
+              name: "cityCompany",
             }}
           />
         </div>
         <div className="">
           <MyInput
-            htmlFor="addressLine1"
-            id="addressLine1"
-            name="addressLine1"
+            htmlFor="addressLine1Company"
+            id="addressLine1Company"
+            name="addressLine1Company"
             type="text"
             label="Address Line 1"
             onChange={formik.handleChange}
-            value={formik.values.addressLine1}
+            value={formik.values.addressLine1Company}
             onBlur={formik.handleBlur}
             error={
-              formik.touched.addressLine1 && formik.errors.addressLine1
-                ? formik.errors.addressLine1
+              formik.touched.addressLine1Company &&
+              formik.errors.addressLine1Company
+                ? formik.errors.addressLine1Company
                 : ""
             }
           />
         </div>
         <div className="">
           <MyInput
-            htmlFor="addressLine2"
-            id="addressLine2"
-            name="addressLine2"
+            htmlFor="addressLine2Company"
+            id="addressLine2Company"
+            name="addressLine2Company"
             type="text"
             label="Address Line 2"
             onChange={formik.handleChange}
-            value={formik.values.addressLine2}
+            value={formik.values.addressLine2Company}
             onBlur={formik.handleBlur}
             error={
-              formik.touched.addressLine2 && formik.errors.addressLine2
-                ? formik.errors.addressLine2
+              formik.touched.addressLine2Company &&
+              formik.errors.addressLine2Company
+                ? formik.errors.addressLine2Company
                 : ""
             }
           />
@@ -279,56 +484,66 @@ const Page = () => {
         <div className="">
           <MyAutocomplete
             label="Contact"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
             getOptionLabel={(option) => option?.name}
-            options={ledgerData}
-            value={formik.values?.contact}
+            options={contactDataCompany}
+            value={formik.values?.contactCompany}
             onChange={(e, newValue) => {
-              formik.setFieldValue("contact", newValue);
+              formik.setFieldValue("contactCompany", newValue);
             }}
             error={
-              formik.touched.contact && formik.errors.contact
-                ? formik.errors.contact
+              formik.touched.contactCompany && formik.errors.contactCompany
+                ? formik.errors.contactCompany
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "contact",
+              name: "contactCompany",
             }}
           />
         </div>
         <div className="">
           <MyInput
-            htmlFor="email"
-            id="email"
-            name="email"
+            htmlFor="emailCompany"
+            id="emailCompany"
+            name="emailCompany"
             type="text"
             label="Email"
             onChange={formik.handleChange}
-            value={formik.values.email}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.email && formik.errors.email
-                ? formik.errors.email
+            value={
+              formik.values?.contactCompany?.email
+                ? formik.values?.contactCompany?.email
                 : ""
             }
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.emailCompany && formik.errors.emailCompany
+                ? formik.errors.emailCompany
+                : ""
+            }
+            disabled
           />
         </div>
         <div className="">
           <MyInput
-            htmlFor="phone"
-            id="phone"
-            name="phone"
+            htmlFor="phoneCompany"
+            id="phoneCompany"
+            name="phoneCompany"
             type="text"
             label="Phone"
             onChange={formik.handleChange}
-            value={formik.values.phone}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.phone && formik.errors.phone
-                ? formik.errors.phone
+            value={
+              formik.values.contactCompany?.phone
+                ? formik.values.contactCompany?.phone
                 : ""
             }
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.phoneCompany && formik.errors.phoneCompany
+                ? formik.errors.phoneCompany
+                : ""
+            }
+            disabled
           />
         </div>
       </div>
@@ -336,124 +551,139 @@ const Page = () => {
         <div className="col-span-2 flex justify-between">
           <p className="font-semibold">Client Details</p>
           <p>
-            <span className="font-semibold">GST : </span>121212
+            <span className="font-semibold">GST : </span>{" "}
+            {formik.values?.client?.gst}
           </p>
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2">
           <MyAutocomplete
             label="Company"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            getOptionLabel={(option) => option?.name}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            getOptionLabel={(option) => option?.companyName}
             options={ledgerData}
-            value={formik.values?.company}
+            value={formik.values?.client}
             onChange={(e, newValue) => {
-              formik.setFieldValue("company", newValue);
+              formik.setFieldValue("client", newValue);
             }}
             error={
-              formik.touched.company && formik.errors.company
-                ? formik.errors.company
+              formik.touched.client && formik.errors.client
+                ? formik.errors.client
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "company",
+              name: "client",
             }}
           />
         </div>
         <div className="">
           <MyAutocomplete
             label="Country"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
             getOptionLabel={(option) => option?.name}
-            options={ledgerData}
-            value={formik.values?.country}
+            options={countryData}
+            value={formik.values?.countryClient}
             onChange={(e, newValue) => {
-              formik.setFieldValue("country", newValue);
+              formik.setValues({
+                ...formik.values,
+                countryClient: newValue,
+                stateClient: null,
+                cityClient: null,
+              });
             }}
             error={
-              formik.touched.country && formik.errors.country
-                ? formik.errors.country
+              formik.touched.countryClient && formik.errors.countryClient
+                ? formik.errors.countryClient
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "country",
+              name: "countryClient",
             }}
           />
         </div>
         <div className="">
           <MyAutocomplete
             label="State/Provence"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
             getOptionLabel={(option) => option?.name}
-            options={ledgerData}
-            value={formik.values?.state}
+            options={stateDataClient}
+            value={formik.values?.stateClient}
             onChange={(e, newValue) => {
-              formik.setFieldValue("state", newValue);
+              formik.setValues({
+                ...formik.values,
+                stateClient: newValue,
+                cityClient: null,
+              });
             }}
             error={
-              formik.touched.state && formik.errors.state
-                ? formik.errors.state
+              formik.touched.stateClient && formik.errors.stateClient
+                ? formik.errors.stateClient
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "state",
+              name: "stateClient",
             }}
           />
         </div>
         <div className="">
           <MyAutocomplete
             label="City"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
             getOptionLabel={(option) => option?.name}
-            options={ledgerData}
-            value={formik.values?.city}
+            options={cityDataClient}
+            value={formik.values?.cityClient}
             onChange={(e, newValue) => {
-              formik.setFieldValue("city", newValue);
+              formik.setValues({
+                ...formik.values,
+                cityClient: null,
+              });
             }}
             error={
-              formik.touched.city && formik.errors.city
-                ? formik.errors.city
+              formik.touched.cityClient && formik.errors.cityClient
+                ? formik.errors.cityClient
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "city",
+              name: "cityClient",
             }}
           />
         </div>
         <div className="">
           <MyInput
-            htmlFor="addressLine1"
-            id="addressLine1"
-            name="addressLine1"
+            htmlFor="addressLine1Client"
+            id="addressLine1Client"
+            name="addressLine1Client"
             type="text"
             label="Address Line 1"
             onChange={formik.handleChange}
-            value={formik.values.addressLine1}
+            value={formik.values.addressLine1Client}
             onBlur={formik.handleBlur}
             error={
-              formik.touched.addressLine1 && formik.errors.addressLine1
-                ? formik.errors.addressLine1
+              formik.touched.addressLine1Client &&
+              formik.errors.addressLine1Client
+                ? formik.errors.addressLine1Client
                 : ""
             }
           />
         </div>
         <div className="">
           <MyInput
-            htmlFor="addressLine2"
-            id="addressLine2"
-            name="addressLine2"
+            htmlFor="addressLine2Client"
+            id="addressLine2Client"
+            name="addressLine2Client"
             type="text"
             label="Address Line 2"
             onChange={formik.handleChange}
-            value={formik.values.addressLine2}
+            value={formik.values.addressLine2Client}
             onBlur={formik.handleBlur}
             error={
-              formik.touched.addressLine2 && formik.errors.addressLine2
-                ? formik.errors.addressLine2
+              formik.touched.addressLine2Client &&
+              formik.errors.addressLine2Client
+                ? formik.errors.addressLine2Client
                 : ""
             }
           />
@@ -461,63 +691,71 @@ const Page = () => {
         <div className="">
           <MyAutocomplete
             label="Contact"
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
             getOptionLabel={(option) => option?.name}
-            options={ledgerData}
-            value={formik.values?.contact}
+            options={contactDataClient}
+            value={formik.values?.contactClient}
             onChange={(e, newValue) => {
-              formik.setFieldValue("contact", newValue);
+              formik.setFieldValue("contactClient", newValue);
             }}
             error={
-              formik.touched.contact && formik.errors.contact
-                ? formik.errors.contact
+              formik.touched.contactClient && formik.errors.contactClient
+                ? formik.errors.contactClient
                 : ""
             }
             inputProps={{
               onBlur: formik.handleBlur,
-              name: "contact",
+              name: "contactClient",
             }}
           />
         </div>
         <div className="">
           <MyInput
-            htmlFor="email"
-            id="email"
-            name="email"
+            htmlFor="emailClient"
+            id="emailClient"
+            name="emailClient"
             type="text"
             label="Email"
             onChange={formik.handleChange}
-            value={formik.values.email}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.email && formik.errors.email
-                ? formik.errors.email
+            value={
+              formik.values.contactClient?.email
+                ? formik.values.contactClient?.email
                 : ""
             }
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.emailClient && formik.errors.emailClient
+                ? formik.errors.emailClient
+                : ""
+            }
+            disabled
           />
         </div>
         <div className="">
           <MyInput
-            htmlFor="phone"
-            id="phone"
-            name="phone"
+            htmlFor="phoneClient"
+            id="phoneClient"
+            name="phoneClient"
             type="text"
             label="Phone"
             onChange={formik.handleChange}
-            value={formik.values.phone}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.phone && formik.errors.phone
-                ? formik.errors.phone
+            value={
+              formik.values.contactClient?.phone
+                ? formik.values.contactClient?.phone
                 : ""
             }
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.phoneClient && formik.errors.phoneClient
+                ? formik.errors.phoneClient
+                : ""
+            }
+            disabled
           />
         </div>
       </div>
       <div className="col-span-2 grid bg-white py-5 px-5 rounded-xl shadow-lg grid-cols-2 gap-3">
-        <div className="col-span-2">
-          {/* <QuotationTable /> */}
-        </div>
+        <div className="col-span-2">{/* <QuotationTable /> */}</div>
       </div>
     </div>
   );
