@@ -30,15 +30,18 @@ const initialValues = {
   cityCompany: null,
   addressLine1Company: "",
   addressLine2Company: "",
+  contactCompany: null,
+  client: null,
   countryClient: null,
   stateClient: null,
   cityClient: null,
   addressLine1Client: "",
   addressLine2Client: "",
-  contactCompany: null,
   contactClient: null,
 
   items: [],
+
+  TAndC: "",
 };
 const Page = () => {
   const [loaded, setLoaded] = useState(false);
@@ -762,6 +765,34 @@ const Page = () => {
       <div className="col-span-2 grid bg-white py-5 px-5 rounded-xl shadow-lg grid-cols-2 gap-3">
         <div className="col-span-2">
           <QuotationTable formik={formik} />
+        </div>
+      </div>
+      <div className="col-span-2 grid bg-white py-5 px-5 rounded-xl shadow-lg grid-cols-2 gap-3">
+        <div className="col-span-2">
+          <div className="w-full">
+            <div className=" py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg">
+              <p className="font-semibold">Terms & Conditions</p>
+              <div className="flex items-center gap-1 md:gap-4"></div>
+            </div>
+            <div>
+              <MyInput
+                htmlFor="TAndC"
+                id="TAndC"
+                name="TAndC"
+                type="textarea"
+                rows={20}
+                // label="Item/Service Desc"
+                onChange={formik.handleChange}
+                value={formik.values.TAndC}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.TAndC && formik.errors.TAndC
+                    ? formik.errors.TAndC
+                    : ""
+                }
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

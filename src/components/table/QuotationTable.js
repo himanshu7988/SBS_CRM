@@ -278,7 +278,7 @@ const QuotationTable = ({ formik }) => {
             {error} !
           </p>
         )}
-        <div className="border-0 border-t-0 border-black py-4 rounded-bl-lg rounded-br-lg shadow-2xl bg-white px-4">
+        {/* <div className="border-0 border-t-0 border-black py-4 rounded-bl-lg rounded-br-lg bg-white px-4">
           <TablePagination
             rowsPerPageOptions={[10, 20, 30, 50]}
             component="div"
@@ -293,7 +293,7 @@ const QuotationTable = ({ formik }) => {
               }`
             }
           />
-        </div>
+        </div> */}
       </div>
       <ItemModal
         formFor={formFor}
