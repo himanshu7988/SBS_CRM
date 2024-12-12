@@ -4,7 +4,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React from "react";
 
-const DateInput = ({ htmlFor, label, error, ...props }) => {
+const DateInput = ({ htmlFor, label, error, format, ...props }) => {
   return (
     <>
       <label
@@ -17,6 +17,7 @@ const DateInput = ({ htmlFor, label, error, ...props }) => {
         <DatePicker
           {...props}
           className="w-full"
+          format={format ? format : "DD/MM/YYYY"}
           slotProps={{
             textField: {
               // size: "small",

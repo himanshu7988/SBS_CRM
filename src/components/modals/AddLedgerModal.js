@@ -11,7 +11,7 @@ import {
 } from "@nextui-org/react";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import MyInput from "../common/Input";
+import MyInput from "@/components/common/Input";
 import {
   CreateLeader,
   getCityList,

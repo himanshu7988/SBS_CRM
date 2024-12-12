@@ -37,6 +37,8 @@ const initialValues = {
   addressLine2Client: "",
   contactCompany: null,
   contactClient: null,
+
+  items: [],
 };
 const Page = () => {
   const [loaded, setLoaded] = useState(false);
@@ -307,15 +309,18 @@ const Page = () => {
         <div>
           <DateInput
             label="Quotation Date"
-            value={formik.values.beginYear}
-            onChange={(newValue) => formik.setFieldValue("beginYear", newValue)}
+            value={formik.values.quotationDate}
+            onChange={(newValue) =>
+              formik.setFieldValue("quotationDate", newValue)
+            }
             maxDate={dayjs()}
             // openTo="year"
             // views={["year"]}
             onBlur={formik.handleBlur}
             error={
-              formik.touched.beginYear && Boolean(formik.errors.beginYear)
-                ? formik.errors.beginYear
+              formik.touched.quotationDate &&
+              Boolean(formik.errors.quotationDate)
+                ? formik.errors.quotationDate
                 : ""
             }
             disabled
@@ -755,7 +760,9 @@ const Page = () => {
         </div>
       </div>
       <div className="col-span-2 grid bg-white py-5 px-5 rounded-xl shadow-lg grid-cols-2 gap-3">
-        <div className="col-span-2">{/* <QuotationTable /> */}</div>
+        <div className="col-span-2">
+          <QuotationTable formik={formik} />
+        </div>
       </div>
     </div>
   );

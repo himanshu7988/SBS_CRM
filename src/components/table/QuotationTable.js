@@ -2,7 +2,7 @@
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import AddContactModal from "@/components/modals/AddLedgerModal";
+import ItemModal from "@/components/modals/quotation/ItemModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -44,6 +44,11 @@ const headCells = [
     numeric: true,
   },
   {
+    label: "Discount Price",
+    //   align:"left",
+    numeric: true,
+  },
+  {
     label: "Total",
     //   align:"left",
     numeric: true,
@@ -55,17 +60,17 @@ const headCells = [
   },
 ];
 
-const QuotationTable = () => {
+const QuotationTable = ({ formik }) => {
   const [page, setPage] = React.useState(0);
   const [totalRecords, setTotalRecords] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [formFor, setFormFor] = React.useState("Add");
   const [currentData, setCurrentData] = React.useState(null);
+  const [currentIndex, setCurrentIndex] = React.useState(null);
   const [isOpenAdd, setIsOpenAdd] = React.useState(false);
-  const [loaded, setLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
-  const [visibleRows, setVisibleRows] = useState([]);
+  // const [visibleRows, setVisibleRows] = useState([]);
   const [searchData, setSearchData] = useState("");
   const searchPramas = useSearchParams();
   const financialYear = searchPramas.get("financialYear");
@@ -73,19 +78,16 @@ const QuotationTable = () => {
   const onOpen = () => {
     setIsOpenAdd(true);
   };
-  const onEdit = (row) => {
+  const onEdit = (row, i) => {
     setFormFor("Update");
     setCurrentData(row);
-    setIsOpenAdd(true);
-  };
-  const onReset = (row) => {
-    setFormFor("resetPass");
-    setCurrentData(row);
+    setCurrentIndex(i);
     setIsOpenAdd(true);
   };
   const onClose = () => {
     setFormFor("Add");
     setCurrentData(null);
+    setCurrentIndex(null);
     setIsOpenAdd(false);
   };
 
@@ -99,72 +101,37 @@ const QuotationTable = () => {
   };
 
   const deleteData = async (id) => {
-    const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await DeleteLedger(id)
-        .then((res) => {
-          if (res.data.success) {
-            resolve(res.data.message);
-            setLoaded(false);
-            onClose();
-          } else {
-            reject(res.data.message);
-          }
-        })
-        .catch((err) => {
-          if (err.response?.data?.message) {
-            return reject(err.response?.data?.message);
-          }
-          reject(err.message);
-        });
-    });
-    toast.promise(resolveWithSomeData, {
-      pending: {
-        render() {
-          return "Deleting...";
-        },
-      },
-      success: {
-        render({ data }) {
-          return `${data}`;
-        },
-      },
-      error: {
-        render({ data }) {
-          // When the promise reject, data will contains the error
-          return `${data}`;
-        },
-      },
-    });
+    formik.setFieldValue("items", formik.values.items.toSpliced(id, 1));
   };
 
-  const getData = async (text) => {
-    setError("");
-    setLoading(true);
-    await GetLedgerList({
-      financialYear: financialYear,
-      page: page + 1,
-      pageSize: rowsPerPage,
-      search: text ? text : searchData,
-    })
-      .then((res) => {
-        if (res?.data?.success) {
-          setVisibleRows(res?.data?.data);
-          setTotalRecords(res?.data?.pagination?.totalRecords);
-        } else {
-          toast.error(res?.data?.message);
-        }
-      })
-      .catch((err) => {
-        setError(err?.message);
-        if (err.response?.data?.message) {
-          return toast.error(err.response?.data?.message);
-        }
-        toast.error(err?.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+  // const getData = async (text) => {
+  //   setError("");
+  //   setLoading(true);
+  //   await GetLedgerList({
+  //     financialYear: financialYear,
+  //     page: page + 1,
+  //     pageSize: rowsPerPage,
+  //     search: text ? text : searchData,
+  //   })
+  //     .then((res) => {
+  //       if (res?.data?.success) {
+  //         setVisibleRows(res?.data?.data);
+  //         setTotalRecords(res?.data?.pagination?.totalRecords);
+  //       } else {
+  //         toast.error(res?.data?.message);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       setError(err?.message);
+  //       if (err.response?.data?.message) {
+  //         return toast.error(err.response?.data?.message);
+  //       }
+  //       toast.error(err?.message);
+  //     })
+  //     .finally(() => {
+  //       setLoading(false);
+  //     });
+  // };
 
   const handleSearch = useCallback(
     debounce((value) => {
@@ -173,12 +140,12 @@ const QuotationTable = () => {
     []
   );
 
-  useEffect(() => {
-    if (!loaded) {
-      return setLoaded(true);
-    }
-    getData();
-  }, [loaded, searchData, page, rowsPerPage]);
+  // useEffect(() => {
+  //   if (!loaded) {
+  //     return setLoaded(true);
+  //   }
+  //   getData();
+  // }, [loaded, searchData, page, rowsPerPage]);
 
   return (
     <>
@@ -218,25 +185,35 @@ const QuotationTable = () => {
             </thead>
             <tbody>
               {!loading &&
-                visibleRows.map((item, i) => (
+                formik.values?.items.map((item, i) => (
                   <tr key={i}>
                     <td align="left" className="whitespace-nowrap">
                       {i + 1 + rowsPerPage * page}
                     </td>
-                    <td align="left">{item?.companyName}</td>
-                    <td align="right">{item?.email}</td>
-                    <td align="right" className="whitespace-nowrap">
-                      {item?.gst}
+                    <td align="left" className="whitespace-pre-wrap">
+                      {item?.itemDesc}
                     </td>
                     <td align="right" className="whitespace-nowrap">
-                      {item?.pan}
+                      {item?.qty}
+                    </td>
+                    <td align="right" className="whitespace-nowrap">
+                      {item?.unitPrice}
+                    </td>
+                    <td align="right" className="whitespace-nowrap">
+                      {item?.discountPrice}
+                    </td>
+                    <td align="right" className="whitespace-nowrap">
+                      {(
+                        item?.qty * item?.unitPrice -
+                        item?.discountPrice
+                      ).toFixed(2)}
                     </td>
                     <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">
                         <IconButton
                           size="small"
                           onClick={() => {
-                            onEdit(item);
+                            onEdit(item, i);
                           }}
                         >
                           <EditIcon fontSize="small" />
@@ -246,7 +223,7 @@ const QuotationTable = () => {
                         <IconButton
                           size="small"
                           onClick={() => {
-                            deleteData(item?._id);
+                            deleteData(i);
                           }}
                         >
                           <DeleteIcon
@@ -291,7 +268,7 @@ const QuotationTable = () => {
             Loading.....
           </p>
         )}
-        {!loading && !visibleRows.length && error == "" && (
+        {!loading && !formik.values?.items.length && error == "" && (
           <p className="justify-center text-xl font-semibold py-10 bg-white flex gap-3">
             No Data Found.
           </p>
@@ -318,12 +295,13 @@ const QuotationTable = () => {
           />
         </div>
       </div>
-      <AddContactModal
+      <ItemModal
         formFor={formFor}
         currentData={currentData}
+        currentIndex={currentIndex}
         isOpen={isOpenAdd}
         onClose={onClose}
-        setLoaded={setLoaded}
+        formik={formik}
       />
     </>
   );

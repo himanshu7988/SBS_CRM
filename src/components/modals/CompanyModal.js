@@ -254,6 +254,7 @@ export default function CompanyModal({
                     onChange={(newValue) =>
                       formik.setFieldValue("beginYear", newValue)
                     }
+                    format="YYYY"
                     maxDate={dayjs()}
                     openTo="year"
                     views={["year"]}
