@@ -294,7 +294,7 @@ const Page = () => {
                       </Tooltip>
                       <Dropdown>
                         <DropdownTrigger>
-                          <Tooltip arrow title="Delete">
+                          <Tooltip arrow title="More">
                             <IconButton variant="bordered">
                               <MdMoreVert />
                             </IconButton>

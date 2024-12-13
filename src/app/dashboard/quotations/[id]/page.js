@@ -13,16 +13,18 @@ import { toast } from "react-toastify";
 import DateInput from "@/components/common/DateInput";
 import dayjs from "dayjs";
 import {
+  UpdateQuotation,
   getCityList,
   GetContactList,
   getCountriesList,
   GetLedgerList,
   getStatesList,
+  GetQuotationById,
 } from "@/config/Api";
 import { useSearchParams } from "next/navigation";
 
 const initialValues = {
-  quotationNo: "",
+  // quotationNo: "",
   quotationDate: dayjs(),
   company: null,
   countryCompany: null,
@@ -43,7 +45,7 @@ const initialValues = {
 
   TAndC: "",
 };
-const Page = () => {
+const Page = ({ params }) => {
   const [loaded, setLoaded] = useState(false);
   const [ledgerData, setLedgerData] = useState([]);
   const [countryData, setCountryData] = useState([]);
@@ -58,23 +60,19 @@ const Page = () => {
 
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: addLedgerSchema,
+    // validationSchema: addLedgerSchema,
     onSubmit: async (values) => {
       formik.setSubmitting(true);
       const resolveWithSomeData = new Promise(async (resolve, reject) => {
-        await CreateLeader({
+        await UpdateQuotation(params?.id,{
           ...values,
-          crDr: values.crDr?.type,
-          city: values.city?.id,
-          state: values.state?.id,
-          country: values.country?.id,
           financialYear: financialYear,
         })
           .then((res) => {
             if (res.data.success) {
               resolve(res.data.message);
-              setLoaded(false);
-              onClose();
+              // setLoaded(false);
+              // onClose();
             } else {
               reject(res.data.message);
             }
@@ -113,6 +111,14 @@ const Page = () => {
 
   const getData = async () => {
     try {
+      const resQuote = await GetQuotationById({ id: params?.id });
+      if (resQuote) {
+        formik.setValues({
+          ...resQuote?.data?.data,
+          quotationDate: dayjs(resQuote?.data?.quotationDate),
+        });
+      }
+
       const [resLedger, resCountry] = await Promise.all([
         GetLedgerList({ financialYear, search: "" }),
         getCountriesList(),
@@ -273,6 +279,8 @@ const Page = () => {
             type="reset"
             className="bg-red-500 text-white font-semibold"
             size="sm"
+            onClick={formik.handleReset}
+            disabled={formik.isSubmitting}
           >
             Reset
           </Button>
@@ -280,8 +288,11 @@ const Page = () => {
             type="submit"
             className="bg-white text-default font-semibold"
             size="sm"
+            onClick={formik.handleSubmit}
+            disabled={formik.isSubmitting}
+            isLoading={formik.isSubmitting}
           >
-            Save
+            Update
           </Button>
         </div>
       </div>
@@ -298,7 +309,7 @@ const Page = () => {
             type="text"
             label="Quotation No"
             // onChange={formik.handleChange}
-            // value={formik.values.quotationNo}
+            value={formik.values.quotationNo}
             // onBlur={formik.handleBlur}
             // error={
             //   formik.touched.quotationNo &&
@@ -646,7 +657,7 @@ const Page = () => {
             onChange={(e, newValue) => {
               formik.setValues({
                 ...formik.values,
-                cityClient: null,
+                cityClient: newValue,
               });
             }}
             error={

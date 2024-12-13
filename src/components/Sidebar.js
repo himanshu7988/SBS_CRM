@@ -72,15 +72,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href={`/dashboard/deals?financialYear=${financialYear}`}
+              href={`/dashboard/quotations?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/deals") &&
+                pathname.includes("/dashboard/quotations") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
               <FaHandshake fontSize={25} />
-              Deals
+              Quotations
             </Link>
           </li>
           <li>
