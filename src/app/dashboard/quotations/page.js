@@ -2,7 +2,7 @@
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import AddContactModal from "@/components/modals/AddContactModal";
+import AddLedgerModal from "@/components/modals/AddLedgerModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -15,13 +15,16 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
-import { DeleteLedger, GetLedgerList } from "@/config/Api";
+import { BASE_URL_MY, DeleteLedger, GetQuotationList } from "@/config/Api";
 import { toast } from "react-toastify";
 import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
 import { MdMoreVert } from "react-icons/md";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import dayjs from "dayjs";
+import { formatIndianNumber } from "@/utils/GlobalFunctions";
+import PrintIcon from '@mui/icons-material/Print';
 
 const headCells = [
   {
@@ -30,29 +33,39 @@ const headCells = [
     numeric: false,
   },
   {
-    label: "Name",
+    label: "Quotation No.",
+    //   align:"left",
+    numeric: false,
+  },
+  {
+    label: "Quotation Date",
+    //   align:"right",
+    numeric: false,
+  },
+  {
+    label: "Client",
+    //   align:"left",
+    numeric: false,
+  },
+  {
+    label: "Contact Person",
+    //   align:"left",
+    numeric: false,
+  },
+  {
+    label: "Phone",
     //   align:"left",
     numeric: false,
   },
   {
     label: "Email",
-    //   align:"right",
-    numeric: false,
-  },
-  {
-    label: "GST",
     //   align:"left",
     numeric: false,
   },
   {
-    label: "PAN",
+    label: "Amount",
     //   align:"left",
-    numeric: false,
-  },
-  {
-    label: "Address",
-    //   align:"left",
-    numeric: false,
+    numeric: true,
   },
   {
     label: "Action",
@@ -62,6 +75,7 @@ const headCells = [
 ];
 
 const Page = () => {
+  const router = useRouter();
   const [page, setPage] = React.useState(0);
   const [totalRecords, setTotalRecords] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -127,7 +141,7 @@ const Page = () => {
   const getData = async (text) => {
     setError("");
     setLoading(true);
-    await GetLedgerList({
+    await GetQuotationList({
       financialYear: financialYear,
       page: page + 1,
       pageSize: rowsPerPage,
@@ -172,12 +186,12 @@ const Page = () => {
       <div className="w-full shadow-md">
         <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
           <h3 className="text-lg md:text-2xl font-semibold text-default ">
-            Deals
+            Quotation
           </h3>
           <div className="flex items-center gap-1 md:gap-4">
             {/* <div className="bg-gray-100 rounded-full p-2 cursor-pointer"> */}
             <Tooltip content="Add Contact">
-              <Link href={`deals/add?financialYear=${financialYear}`}>
+              <Link href={`quotations/add?financialYear=${financialYear}`}>
                 <IconButton>
                   <FaPlus fontSize={20} />
                 </IconButton>
@@ -228,25 +242,39 @@ const Page = () => {
                     <td align="left" className="whitespace-nowrap">
                       {i + 1 + rowsPerPage * page}
                     </td>
-                    <td align="left">{item?.companyName}</td>
-                    <td align="left">{item?.email}</td>
                     <td align="left" className="whitespace-nowrap">
-                      {item?.gst}
+                      {item?.quotationNo}
                     </td>
                     <td align="left" className="whitespace-nowrap">
-                      {item?.pan}
+                      {dayjs(item?.quotationDate).format("DD-MM-YYYY")}
                     </td>
-                    <td align="left">
-                      {item?.addressLine1} {item?.addressLine2}{" "}
-                      {item?.city?.name} {item?.state?.name}{" "}
-                      {item?.country?.name}
+                    <td align="left">{item?.client?.companyName}</td>
+                    <td align="left">{item?.contactClient?.name}</td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.contactClient?.phone}
+                    </td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.contactClient?.email}
+                    </td>
+                    <td align="right">
+                      {formatIndianNumber(
+                        item?.items.reduce((acc, current) => {
+                          return (
+                            acc +
+                            current?.qty * current?.unitPrice -
+                            current?.discountPrice
+                          );
+                        }, 0)
+                      )}
                     </td>
                     <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">
                         <IconButton
                           size="small"
                           onClick={() => {
-                            onEdit(item);
+                            router.push(
+                              `quotations/${item?._id}?financialYear=${financialYear}`
+                            );
                           }}
                         >
                           <EditIcon fontSize="small" />
@@ -265,9 +293,9 @@ const Page = () => {
                           />
                         </IconButton>
                       </Tooltip>
-                      {/* <Dropdown>
+                      <Dropdown>
                         <DropdownTrigger>
-                          <Tooltip arrow title="Delete">
+                          <Tooltip arrow title="More">
                             <IconButton variant="bordered">
                               <MdMoreVert />
                             </IconButton>
@@ -280,15 +308,19 @@ const Page = () => {
                           <DropdownItem
                             key="new"
                             // shortcut="⌘N"
-                            // startContent={<AddNoteIcon className={iconClasses} />}
+                            startContent={<PrintIcon />}
                             onClick={() => {
-                              onReset(item);
+                              window.open(
+                                `${BASE_URL_MY}/printQuotations/${item?._id}`,
+                                `_blank${item?._id}`,
+                                "noopener,noreferrer",
+                              )
                             }}
                           >
-                            Reset Password
+                            Print
                           </DropdownItem>
                         </DropdownMenu>
-                      </Dropdown> */}
+                      </Dropdown>
                     </td>
                   </tr>
                 ))}

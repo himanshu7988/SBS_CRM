@@ -7,7 +7,7 @@ export const SigninSchema = Yup.object().shape({
     .required("Required*"),
 });
 
-export const addContactSchema = Yup.object().shape({
+export const addLedgerSchema = Yup.object().shape({
   companyName: Yup.string()
     .min(2, "Company name is too short")
     .max(100, "Company name is too long")
@@ -90,4 +90,27 @@ export const createCompanySchema = Yup.object().shape({
     )
     .email("Invalid email address")
     .required("Email is required"),
+});
+
+export const addContactSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(2, "Company name is too short")
+    .max(100, "Company name is too long")
+    .required("Company name is required"),
+  department: Yup.string()
+    .min(2, "Company name is too short")
+    .max(100, "Company name is too long")
+    .required("Company name is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .when("phone", {
+      is: (phone) => !phone || phone.trim() === "",
+      then: () => Yup.string().required("Either email or phone is required"),
+    }),
+  phone: Yup.string().matches(
+    /^\+\d{1,3}[- ]?\d{4,14}(\s?\d{1,13})?$/,
+    "Phone number must include a country code and be digits only"
+  ),
+  stdCode: Yup.string(),
+  landline: Yup.string(),
 });

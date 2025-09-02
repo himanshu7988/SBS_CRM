@@ -11,7 +11,7 @@ import {
 } from "@nextui-org/react";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import MyInput from "../common/Input";
+import MyInput from "@/components/common/Input";
 import {
   CreateLeader,
   getCityList,
@@ -23,7 +23,7 @@ import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { addContactSchema } from "@/models/ValidationSchemas";
+import { addLedgerSchema } from "@/models/ValidationSchemas";
 import MyAutocomplete from "@/components/common/MyAutocomplete";
 import { useSearchParams } from "next/navigation";
 
@@ -71,7 +71,7 @@ const StyledTextField = styled(TextField)(({ theme, error }) => ({
   },
 }));
 
-export default function AddContactModal({
+export default function AddLedgerModal({
   formFor,
   currentData,
   isOpen,
@@ -85,12 +85,11 @@ export default function AddContactModal({
   const financialYear = searchPramas.get("financialYear");
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: addContactSchema,
+    validationSchema: addLedgerSchema,
     onSubmit: async (values) => {
       formik.setSubmitting(true);
       const resolveWithSomeData = new Promise(async (resolve, reject) => {
         if (formFor == "Add") {
-          console.log(values);
           await CreateLeader({
             ...values,
             crDr: values.crDr?.type,
