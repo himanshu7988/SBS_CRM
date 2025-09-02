@@ -21,6 +21,7 @@ th:nth-child(1) {
 
 td,
 th {
+  vertical-align: top;
   padding: 0.5rem;
   font-weight: 300;
 }

@@ -2,7 +2,7 @@
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import CompanyModal from "@/components/modals/CompanyModal";
+import ItemModal from "@/components/modals/quotation/ItemModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -15,11 +15,12 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
-import { DeleteCompany, GetCompanyList, UpdateUser } from "@/config/Api";
+import { DeleteLedger, GetLedgerList } from "@/config/Api";
 import { toast } from "react-toastify";
 import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
 import { MdMoreVert } from "react-icons/md";
+import { useSearchParams } from "next/navigation";
 
 const headCells = [
   {
@@ -28,34 +29,29 @@ const headCells = [
     numeric: false,
   },
   {
-    label: "Name",
+    label: "Item/Service Description",
     //   align:"left",
     numeric: false,
   },
   {
-    label: "FY's",
-    // align: "center",
-    numeric: false,
+    label: "Quantity",
+    //   align:"right",
+    numeric: true,
   },
   {
-    label: "Email",
-    // align: "center",
-    numeric: false,
+    label: "Unit Price",
+    //   align:"left",
+    numeric: true,
   },
   {
-    label: "Pan",
-    // align: "center",
-    numeric: false,
+    label: "Discount Price",
+    //   align:"left",
+    numeric: true,
   },
   {
-    label: "Gst",
-    // align: "center",
-    numeric: false,
-  },
-  {
-    label: "Billing Address",
-    align: "left",
-    // numeric: false,
+    label: "Total",
+    //   align:"left",
+    numeric: true,
   },
   {
     label: "Action",
@@ -64,35 +60,34 @@ const headCells = [
   },
 ];
 
-const Page = () => {
+const QuotationTable = ({ formik }) => {
   const [page, setPage] = React.useState(0);
   const [totalRecords, setTotalRecords] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [formFor, setFormFor] = React.useState("Add");
   const [currentData, setCurrentData] = React.useState(null);
+  const [currentIndex, setCurrentIndex] = React.useState(null);
   const [isOpenAdd, setIsOpenAdd] = React.useState(false);
-  const [loaded, setLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
-  const [visibleRows, setVisibleRows] = useState([]);
+  // const [visibleRows, setVisibleRows] = useState([]);
   const [searchData, setSearchData] = useState("");
+  const searchPramas = useSearchParams();
+  const financialYear = searchPramas.get("financialYear");
 
   const onOpen = () => {
     setIsOpenAdd(true);
   };
-  const onEdit = (row) => {
+  const onEdit = (row, i) => {
     setFormFor("Update");
     setCurrentData(row);
-    setIsOpenAdd(true);
-  };
-  const onReset = (row) => {
-    setFormFor("resetPass");
-    setCurrentData(row);
+    setCurrentIndex(i);
     setIsOpenAdd(true);
   };
   const onClose = () => {
     setFormFor("Add");
     setCurrentData(null);
+    setCurrentIndex(null);
     setIsOpenAdd(false);
   };
 
@@ -106,112 +101,37 @@ const Page = () => {
   };
 
   const deleteData = async (id) => {
-    const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await DeleteCompany(id)
-        .then((res) => {
-          if (res.data.success) {
-            resolve(res.data.message);
-            setLoaded(false);
-            onClose();
-          } else {
-            reject(res.data.message);
-          }
-        })
-        .catch((err) => {
-          if (err.response?.data?.message) {
-            return reject(err.response?.data?.message);
-          }
-          reject(err.message);
-        });
-    });
-    toast.promise(resolveWithSomeData, {
-      pending: {
-        render() {
-          return "Deleting...";
-        },
-      },
-      success: {
-        render({ data }) {
-          return `${data}`;
-        },
-      },
-      error: {
-        render({ data }) {
-          // When the promise reject, data will contains the error
-          return `${data}`;
-        },
-      },
-    });
+    formik.setFieldValue("items", formik.values.items.toSpliced(id, 1));
   };
 
-  const changeStatus = (id, status) => {
-    const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await UpdateUser(id, {
-        isActive: status,
-      })
-        .then((res) => {
-          if (res.data.success) {
-            resolve(res.data.message);
-            setLoaded(false);
-          } else {
-            reject(res.data.message);
-          }
-        })
-        .catch((err) => {
-          if (err.response?.data?.message) {
-            return reject(err.response?.data?.message);
-          }
-          reject(err.message);
-        });
-    });
-
-    toast.promise(resolveWithSomeData, {
-      pending: {
-        render() {
-          return "Saving...";
-        },
-      },
-      success: {
-        render({ data }) {
-          return `${data}`;
-        },
-      },
-      error: {
-        render({ data }) {
-          // When the promise reject, data will contains the error
-          return `${data}`;
-        },
-      },
-    });
-  };
-
-  const getData = async (text) => {
-    setError("");
-    setLoading(true);
-    await GetCompanyList({
-      page: page + 1,
-      pageSize: rowsPerPage,
-      search: text ? text : searchData,
-    })
-      .then((res) => {
-        if (res?.data?.success) {
-          setVisibleRows(res?.data?.data);
-          setTotalRecords(res?.data?.pagination?.totalRecords);
-        } else {
-          toast.error(res?.data?.message);
-        }
-      })
-      .catch((err) => {
-        setError(err?.message);
-        if (err.response?.data?.message) {
-          return toast.error(err.response?.data?.message);
-        }
-        toast.error(err?.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+  // const getData = async (text) => {
+  //   setError("");
+  //   setLoading(true);
+  //   await GetLedgerList({
+  //     financialYear: financialYear,
+  //     page: page + 1,
+  //     pageSize: rowsPerPage,
+  //     search: text ? text : searchData,
+  //   })
+  //     .then((res) => {
+  //       if (res?.data?.success) {
+  //         setVisibleRows(res?.data?.data);
+  //         setTotalRecords(res?.data?.pagination?.totalRecords);
+  //       } else {
+  //         toast.error(res?.data?.message);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       setError(err?.message);
+  //       if (err.response?.data?.message) {
+  //         return toast.error(err.response?.data?.message);
+  //       }
+  //       toast.error(err?.message);
+  //     })
+  //     .finally(() => {
+  //       setLoading(false);
+  //     });
+  // };
 
   const handleSearch = useCallback(
     debounce((value) => {
@@ -220,20 +140,18 @@ const Page = () => {
     []
   );
 
-  useEffect(() => {
-    if (!loaded) {
-      return setLoaded(true);
-    }
-    getData();
-  }, [loaded, searchData, page, rowsPerPage]);
+  // useEffect(() => {
+  //   if (!loaded) {
+  //     return setLoaded(true);
+  //   }
+  //   getData();
+  // }, [loaded, searchData, page, rowsPerPage]);
 
   return (
     <>
-      <div className="w-full shadow-md">
-        <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
-          <h3 className="text-lg md:text-2xl font-semibold text-default ">
-            Companies
-          </h3>
+      <div className="w-full">
+        <div className=" py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg">
+          <p className="font-semibold">Quotation Items</p>
           <div className="flex items-center gap-1 md:gap-4">
             {/* <div className="bg-gray-100 rounded-full p-2 cursor-pointer"> */}
             <Tooltip content="Add Contact">
@@ -242,23 +160,9 @@ const Page = () => {
               </IconButton>
             </Tooltip>
             {/* </div> */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search"
-                className="px-8 md:px-12 py-1 md:py-3 w-40 md:w-[17rem] rounded-[2rem] focus:outline-none border-none bg-gray-100"
-                value={searchData}
-                onChange={(e) => {
-                  setSearchData(e.target.value);
-                  // handleSearch(e.target.value);
-                }}
-              />
-              <span className="absolute top-1/2 left-1 p-1 md:p-2 rounded-full bg-purple-300 -translate-y-1/2">
-                <IoIosSearch className="text-md md:text-xl" />
-              </span>
-            </div>
           </div>
         </div>
+        <hr className="col-span-2" />
         <div className="overflow-x-auto scroll-my-1 w-full">
           <table className="w-full">
             <thead>
@@ -281,28 +185,35 @@ const Page = () => {
             </thead>
             <tbody>
               {!loading &&
-                visibleRows.map((item, i) => (
+                formik.values?.items.map((item, i) => (
                   <tr key={i}>
-                    <td align="left" className="whitespace-nowrap">{i + 1 + rowsPerPage * page}</td>
-                    <td align="left">{item?.companyName}</td>
                     <td align="left" className="whitespace-nowrap">
-                      {item?.financialYears?.[0].financialYear.split("-")?.[0]}-
-                      {
-                        item?.financialYears?.[
-                          item?.financialYears.length - 1
-                        ].financialYear.split("-")?.[1]
-                      }
+                      {i + 1 + rowsPerPage * page}
                     </td>
-                    <td align="left" className="whitespace-nowrap">{item?.email}</td>
-                    <td align="left" className="whitespace-nowrap">{item?.pan}</td>
-                    <td align="left" className="whitespace-nowrap">{item?.gst}</td>
-                    <td align="left">{item?.billingAddress}</td>
+                    <td align="left" className="whitespace-pre-wrap">
+                      {item?.itemDesc}
+                    </td>
+                    <td align="right" className="whitespace-nowrap">
+                      {item?.qty}
+                    </td>
+                    <td align="right" className="whitespace-nowrap">
+                      {item?.unitPrice}
+                    </td>
+                    <td align="right" className="whitespace-nowrap">
+                      {item?.discountPrice}
+                    </td>
+                    <td align="right" className="whitespace-nowrap">
+                      {(
+                        item?.qty * item?.unitPrice -
+                        item?.discountPrice
+                      ).toFixed(2)}
+                    </td>
                     <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">
                         <IconButton
                           size="small"
                           onClick={() => {
-                            onEdit(item);
+                            onEdit(item, i);
                           }}
                         >
                           <EditIcon fontSize="small" />
@@ -312,7 +223,7 @@ const Page = () => {
                         <IconButton
                           size="small"
                           onClick={() => {
-                            deleteData(item?._id);
+                            deleteData(i);
                           }}
                         >
                           <DeleteIcon
@@ -357,7 +268,7 @@ const Page = () => {
             Loading.....
           </p>
         )}
-        {!loading && !visibleRows.length && error == "" && (
+        {!loading && !formik.values?.items.length && error == "" && (
           <p className="justify-center text-xl font-semibold py-10 bg-white flex gap-3">
             No Data Found.
           </p>
@@ -367,7 +278,7 @@ const Page = () => {
             {error} !
           </p>
         )}
-        <div className="border-0 border-t-0 border-black py-4 rounded-bl-lg rounded-br-lg shadow-2xl bg-white px-4">
+        {/* <div className="border-0 border-t-0 border-black py-4 rounded-bl-lg rounded-br-lg bg-white px-4">
           <TablePagination
             rowsPerPageOptions={[10, 20, 30, 50]}
             component="div"
@@ -382,17 +293,18 @@ const Page = () => {
               }`
             }
           />
-        </div>
+        </div> */}
       </div>
-      <CompanyModal
+      <ItemModal
         formFor={formFor}
         currentData={currentData}
+        currentIndex={currentIndex}
         isOpen={isOpenAdd}
         onClose={onClose}
-        setLoaded={setLoaded}
+        formik={formik}
       />
     </>
   );
 };
 
-export default Page;
+export default QuotationTable;

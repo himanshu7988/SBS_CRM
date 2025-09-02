@@ -2,7 +2,7 @@
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import CompanyModal from "@/components/modals/CompanyModal";
+import AddLedgerModal from "@/components/modals/AddLedgerModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -15,11 +15,16 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
-import { DeleteCompany, GetCompanyList, UpdateUser } from "@/config/Api";
+import { BASE_URL_MY, DeleteLedger, GetQuotationList } from "@/config/Api";
 import { toast } from "react-toastify";
 import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
 import { MdMoreVert } from "react-icons/md";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import dayjs from "dayjs";
+import { formatIndianNumber } from "@/utils/GlobalFunctions";
+import PrintIcon from '@mui/icons-material/Print';
 
 const headCells = [
   {
@@ -28,34 +33,39 @@ const headCells = [
     numeric: false,
   },
   {
-    label: "Name",
+    label: "Quotation No.",
     //   align:"left",
     numeric: false,
   },
   {
-    label: "FY's",
-    // align: "center",
+    label: "Quotation Date",
+    //   align:"right",
+    numeric: false,
+  },
+  {
+    label: "Client",
+    //   align:"left",
+    numeric: false,
+  },
+  {
+    label: "Contact Person",
+    //   align:"left",
+    numeric: false,
+  },
+  {
+    label: "Phone",
+    //   align:"left",
     numeric: false,
   },
   {
     label: "Email",
-    // align: "center",
+    //   align:"left",
     numeric: false,
   },
   {
-    label: "Pan",
-    // align: "center",
-    numeric: false,
-  },
-  {
-    label: "Gst",
-    // align: "center",
-    numeric: false,
-  },
-  {
-    label: "Billing Address",
-    align: "left",
-    // numeric: false,
+    label: "Amount",
+    //   align:"left",
+    numeric: true,
   },
   {
     label: "Action",
@@ -65,6 +75,7 @@ const headCells = [
 ];
 
 const Page = () => {
+  const router = useRouter();
   const [page, setPage] = React.useState(0);
   const [totalRecords, setTotalRecords] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -76,25 +87,8 @@ const Page = () => {
   const [error, setError] = React.useState("");
   const [visibleRows, setVisibleRows] = useState([]);
   const [searchData, setSearchData] = useState("");
-
-  const onOpen = () => {
-    setIsOpenAdd(true);
-  };
-  const onEdit = (row) => {
-    setFormFor("Update");
-    setCurrentData(row);
-    setIsOpenAdd(true);
-  };
-  const onReset = (row) => {
-    setFormFor("resetPass");
-    setCurrentData(row);
-    setIsOpenAdd(true);
-  };
-  const onClose = () => {
-    setFormFor("Add");
-    setCurrentData(null);
-    setIsOpenAdd(false);
-  };
+  const searchPramas = useSearchParams();
+  const financialYear = searchPramas.get("financialYear");
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -107,7 +101,7 @@ const Page = () => {
 
   const deleteData = async (id) => {
     const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await DeleteCompany(id)
+      await DeleteLedger(id)
         .then((res) => {
           if (res.data.success) {
             resolve(res.data.message);
@@ -144,51 +138,11 @@ const Page = () => {
     });
   };
 
-  const changeStatus = (id, status) => {
-    const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await UpdateUser(id, {
-        isActive: status,
-      })
-        .then((res) => {
-          if (res.data.success) {
-            resolve(res.data.message);
-            setLoaded(false);
-          } else {
-            reject(res.data.message);
-          }
-        })
-        .catch((err) => {
-          if (err.response?.data?.message) {
-            return reject(err.response?.data?.message);
-          }
-          reject(err.message);
-        });
-    });
-
-    toast.promise(resolveWithSomeData, {
-      pending: {
-        render() {
-          return "Saving...";
-        },
-      },
-      success: {
-        render({ data }) {
-          return `${data}`;
-        },
-      },
-      error: {
-        render({ data }) {
-          // When the promise reject, data will contains the error
-          return `${data}`;
-        },
-      },
-    });
-  };
-
   const getData = async (text) => {
     setError("");
     setLoading(true);
-    await GetCompanyList({
+    await GetQuotationList({
+      financialYear: financialYear,
       page: page + 1,
       pageSize: rowsPerPage,
       search: text ? text : searchData,
@@ -232,14 +186,16 @@ const Page = () => {
       <div className="w-full shadow-md">
         <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
           <h3 className="text-lg md:text-2xl font-semibold text-default ">
-            Companies
+            Quotation
           </h3>
           <div className="flex items-center gap-1 md:gap-4">
             {/* <div className="bg-gray-100 rounded-full p-2 cursor-pointer"> */}
             <Tooltip content="Add Contact">
-              <IconButton onClick={onOpen}>
-                <FaPlus fontSize={20} />
-              </IconButton>
+              <Link href={`quotations/add?financialYear=${financialYear}`}>
+                <IconButton>
+                  <FaPlus fontSize={20} />
+                </IconButton>
+              </Link>
             </Tooltip>
             {/* </div> */}
             <div className="relative">
@@ -283,26 +239,42 @@ const Page = () => {
               {!loading &&
                 visibleRows.map((item, i) => (
                   <tr key={i}>
-                    <td align="left" className="whitespace-nowrap">{i + 1 + rowsPerPage * page}</td>
-                    <td align="left">{item?.companyName}</td>
                     <td align="left" className="whitespace-nowrap">
-                      {item?.financialYears?.[0].financialYear.split("-")?.[0]}-
-                      {
-                        item?.financialYears?.[
-                          item?.financialYears.length - 1
-                        ].financialYear.split("-")?.[1]
-                      }
+                      {i + 1 + rowsPerPage * page}
                     </td>
-                    <td align="left" className="whitespace-nowrap">{item?.email}</td>
-                    <td align="left" className="whitespace-nowrap">{item?.pan}</td>
-                    <td align="left" className="whitespace-nowrap">{item?.gst}</td>
-                    <td align="left">{item?.billingAddress}</td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.quotationNo}
+                    </td>
+                    <td align="left" className="whitespace-nowrap">
+                      {dayjs(item?.quotationDate).format("DD-MM-YYYY")}
+                    </td>
+                    <td align="left">{item?.client?.companyName}</td>
+                    <td align="left">{item?.contactClient?.name}</td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.contactClient?.phone}
+                    </td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.contactClient?.email}
+                    </td>
+                    <td align="right">
+                      {formatIndianNumber(
+                        item?.items.reduce((acc, current) => {
+                          return (
+                            acc +
+                            current?.qty * current?.unitPrice -
+                            current?.discountPrice
+                          );
+                        }, 0)
+                      )}
+                    </td>
                     <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">
                         <IconButton
                           size="small"
                           onClick={() => {
-                            onEdit(item);
+                            router.push(
+                              `quotations/${item?._id}?financialYear=${financialYear}`
+                            );
                           }}
                         >
                           <EditIcon fontSize="small" />
@@ -321,9 +293,9 @@ const Page = () => {
                           />
                         </IconButton>
                       </Tooltip>
-                      {/* <Dropdown>
+                      <Dropdown>
                         <DropdownTrigger>
-                          <Tooltip arrow title="Delete">
+                          <Tooltip arrow title="More">
                             <IconButton variant="bordered">
                               <MdMoreVert />
                             </IconButton>
@@ -336,15 +308,19 @@ const Page = () => {
                           <DropdownItem
                             key="new"
                             // shortcut="⌘N"
-                            // startContent={<AddNoteIcon className={iconClasses} />}
+                            startContent={<PrintIcon />}
                             onClick={() => {
-                              onReset(item);
+                              window.open(
+                                `${BASE_URL_MY}/printQuotations/${item?._id}`,
+                                `_blank${item?._id}`,
+                                "noopener,noreferrer",
+                              )
                             }}
                           >
-                            Reset Password
+                            Print
                           </DropdownItem>
                         </DropdownMenu>
-                      </Dropdown> */}
+                      </Dropdown>
                     </td>
                   </tr>
                 ))}
@@ -384,13 +360,6 @@ const Page = () => {
           />
         </div>
       </div>
-      <CompanyModal
-        formFor={formFor}
-        currentData={currentData}
-        isOpen={isOpenAdd}
-        onClose={onClose}
-        setLoaded={setLoaded}
-      />
     </>
   );
 };

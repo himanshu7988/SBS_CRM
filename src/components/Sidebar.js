@@ -8,11 +8,13 @@ import { MdLogout } from "react-icons/md";
 import { MdMessage } from "react-icons/md";
 import { TbReportSearch } from "react-icons/tb";
 import { IoHelpCircleSharp } from "react-icons/io5";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { TiArrowBack } from "react-icons/ti";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const pathname = usePathname();
+  const searchPramas = useSearchParams();
+  const financialYear = searchPramas.get("financialYear");
 
   return (
     <section
@@ -22,9 +24,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex flex-col justify-center items-start ">
-        <div className="text-white flex w-full justify-end px-6 pt-3">
+        <Link
+          href="/selectCompany"
+          className="text-white flex w-full justify-end px-6 pt-3"
+        >
           <TiArrowBack fontSize={25} className="cursor-pointer" />
-        </div>
+        </Link>
         <Link href="/dashboard" className="flex gap-2 py-6 md:px-6 px-4">
           <Image
             width={176}
@@ -40,7 +45,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         <ul className="flex flex-col gap-4 ">
           <li>
             <Link
-              href="/dashboard"
+              href={`/dashboard?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer 
                 ${
@@ -54,33 +59,33 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/companies"
+              href={`/dashboard/ledgers?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/companies") &&
+                pathname.includes("/dashboard/ledgers") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
               <FaUsers fontSize={25} />
-              Companies
+              Ledgers
             </Link>
           </li>
           <li>
             <Link
-              href="/dashboard/deals"
+              href={`/dashboard/quotations?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
-                pathname.includes("/dashboard/deals") &&
+                pathname.includes("/dashboard/quotations") &&
                 "text-yellow-400 border-r-4 border-yellow-400"
               }`}
             >
               <FaHandshake fontSize={25} />
-              Deals
+              Quotations
             </Link>
           </li>
           <li>
             <Link
-              href="/dashboard/contact"
+              href={`/dashboard/contact?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/contact") &&
@@ -93,7 +98,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/reports"
+              href={`/dashboard/reports?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/reports") &&
@@ -106,7 +111,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/messages"
+              href={`/dashboard/messages?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/messages") &&
@@ -119,7 +124,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </li>
           <li>
             <Link
-              href="/dashboard/help"
+              href={`/dashboard/help?financialYear=${financialYear}`}
               onClick={() => setSidebarOpen(false)}
               className={`px-3 flex gap-2 items-center py-1 mb-6 text-xl text-white font-light hover:text-yellow-400 hover:border-r-4 border-yellow-400 cursor-pointer ${
                 pathname.includes("/dashboard/help") &&

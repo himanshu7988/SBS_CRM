@@ -7,24 +7,39 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  autocomplete,
 } from "@nextui-org/react";
 import { useFormik } from "formik";
-import { useEffect } from "react";
-import MyInput from "../common/Input";
-import { CreateCompany, UpdateCompany } from "@/config/Api";
+import { useEffect, useState } from "react";
+import MyInput from "../../common/Input";
+import {
+  CreateContact,
+  getCityList,
+  getCountriesList,
+  getStatesList,
+  UpdateContact,
+} from "@/config/Api";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import { createCompanySchema } from "@/models/ValidationSchemas";
-import DateInput from "@/components/common/DateInput";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { addContactSchema } from "@/models/ValidationSchemas";
+import MyAutocomplete from "@/components/common/MyAutocomplete";
+import { useSearchParams } from "next/navigation";
+
+const options = [
+  { label: "Credit", id: 1, type: "Cr" },
+  { label: "Debit", id: 2, type: "Dr" },
+];
 
 const initialValues = {
-  companyName: "",
-  companyMailingName: "",
+  name: "",
+  department: "",
   email: "",
-  gst: "",
-  pan: "",
-  beginYear: dayjs(),
-  billingAddress: "",
+  phone: "",
+  stdCode: "",
+  landline: "",
+  // international: false,
 };
 
 const StyledTextField = styled(TextField)(({ theme, error }) => ({
@@ -50,23 +65,31 @@ const StyledTextField = styled(TextField)(({ theme, error }) => ({
   },
 }));
 
-export default function CompanyModal({
+export default function AddContactModal({
   formFor,
+  currentDataPrev,
   currentData,
   isOpen,
   onClose,
   setLoaded,
 }) {
+  const [countryData, setCountryData] = useState([]);
+  const [stateData, setStateData] = useState([]);
+  const [cityData, setCityData] = useState([]);
+  const searchPramas = useSearchParams();
+  const financialYear = searchPramas.get("financialYear");
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: createCompanySchema,
+    validationSchema: addContactSchema,
     onSubmit: async (values) => {
       formik.setSubmitting(true);
       const resolveWithSomeData = new Promise(async (resolve, reject) => {
         if (formFor == "Add") {
-          await CreateCompany({
+          console.log(values,currentData);
+          await CreateContact({
             ...values,
-            beginYear: dayjs(values.beginYear).format("YYYY"),
+            ledger: currentDataPrev?._id,
+            financialYear: financialYear,
           })
             .then((res) => {
               if (res.data.success) {
@@ -88,7 +111,11 @@ export default function CompanyModal({
             });
         }
         if (formFor == "Update") {
-          await UpdateCompany(currentData._id, values)
+          await UpdateContact(currentData._id, {
+            ...values,
+            ledger: currentDataPrev?._id,
+            financialYear: financialYear,
+          })
             .then((res) => {
               if (res.data.success) {
                 resolve(res.data.message);
@@ -131,6 +158,47 @@ export default function CompanyModal({
     },
   });
 
+  const getCountry = async () => {
+    try {
+      const resCountry = await getCountriesList();
+      if (resCountry) {
+        setCountryData(resCountry?.data?.data);
+      }
+    } catch (error) {}
+  };
+  const getState = async (id) => {
+    try {
+      const resCountry = await getStatesList({ id });
+      if (resCountry) {
+        setStateData(resCountry?.data?.data);
+      }
+    } catch (error) {}
+  };
+  const getCity = async (id) => {
+    try {
+      const resCountry = await getCityList({ id });
+      if (resCountry) {
+        setCityData(resCountry?.data?.data);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    if (!formik.values.country) {
+      setStateData([]);
+      setCityData([]);
+    } else {
+      getState(formik.values.country?.id);
+    }
+  }, [formik.values.country]);
+  useEffect(() => {
+    if (!formik.values.state) {
+      setCityData([]);
+    } else {
+      getCity(formik.values.state?.id);
+    }
+  }, [formik.values.state]);
+
   useEffect(() => {
     if (!isOpen) {
       formik.resetForm();
@@ -138,8 +206,11 @@ export default function CompanyModal({
     if (formFor == "Update") {
       formik.setValues({
         ...currentData,
-        beginYear: dayjs(currentData?.beginYear),
+        crDr: options.filter((item) => item?.type == currentData.crDr)[0],
       });
+    }
+    if (isOpen) {
+      getCountry();
     }
   }, [isOpen]);
 
@@ -154,83 +225,46 @@ export default function CompanyModal({
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
-            {formFor == "Add" ? "Add" : "Update"} Company
+            {formFor == "Add" ? "Add" : "Update"} Contact
           </ModalHeader>
           <ModalBody>
             <form onSubmit={formik.handleSubmit}>
               <div className="mt-1">
                 <MyInput
-                  htmlFor="companyName"
-                  id="companyName"
-                  name="companyName"
+                  htmlFor="name"
+                  id="name"
+                  name="name"
                   type="text"
-                  label="Company Name"
+                  label="Name"
                   onChange={formik.handleChange}
-                  value={formik.values.companyName}
+                  value={formik.values.name}
                   onBlur={formik.handleBlur}
                   error={
-                    formik.touched.companyName && formik.errors.companyName
-                      ? formik.errors.companyName
+                    formik.touched.name && formik.errors.name
+                      ? formik.errors.name
                       : ""
                   }
                 />
               </div>
               <div className="mt-1">
                 <MyInput
-                  htmlFor="companyMailingName"
-                  id="companyMailingName"
-                  name="companyMailingName"
+                  htmlFor="department"
+                  id="department"
+                  name="department"
                   type="text"
-                  label="Mailing Name"
+                  label="Department"
                   onChange={formik.handleChange}
-                  value={formik.values.companyMailingName}
+                  value={formik.values.department}
                   onBlur={formik.handleBlur}
                   error={
-                    formik.touched.companyMailingName &&
-                    formik.errors.companyMailingName
-                      ? formik.errors.companyMailingName
+                    formik.touched.department && formik.errors.department
+                      ? formik.errors.department
                       : ""
                   }
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
-                <div className="mt-1">
-                  <MyInput
-                    htmlFor="pan"
-                    id="pan"
-                    name="pan"
-                    type="text"
-                    label="PAN Number"
-                    onChange={formik.handleChange}
-                    value={formik.values.pan}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.pan && formik.errors.pan
-                        ? formik.errors.pan
-                        : ""
-                    }
-                  />
-                </div>
-                <div className="mt-1">
-                  <MyInput
-                    htmlFor="gst"
-                    id="gst"
-                    name="gst"
-                    type="text"
-                    label="GST Number"
-                    onChange={formik.handleChange}
-                    value={formik.values.gst}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.gst && formik.errors.gst
-                        ? formik.errors.gst
-                        : ""
-                    }
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
-                <div className="mt-1">
+                <div className="mt-1 col-span-2">
                   <MyInput
                     htmlFor="email"
                     id="email"
@@ -247,44 +281,59 @@ export default function CompanyModal({
                     }
                   />
                 </div>
+              </div>
+              <div className="mt-1">
+                <MyInput
+                  htmlFor="phone"
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  label="Phone"
+                  onChange={formik.handleChange}
+                  value={formik.values.phone}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.phone && formik.errors.phone
+                      ? formik.errors.phone
+                      : ""
+                  }
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
                 <div className="mt-1">
-                  <DateInput
-                    label="BeginYear"
-                    value={formik.values.beginYear}
-                    onChange={(newValue) =>
-                      formik.setFieldValue("beginYear", newValue)
-                    }
-                    format="YYYY"
-                    maxDate={dayjs()}
-                    openTo="year"
-                    views={["year"]}
+                  <MyInput
+                    htmlFor="stdCode"
+                    id="stdCode"
+                    name="stdCode"
+                    type="text"
+                    label="Std Code"
+                    onChange={formik.handleChange}
+                    value={formik.values.stdCode}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.beginYear &&
-                      Boolean(formik.errors.beginYear)
-                        ? formik.errors.beginYear
+                      formik.touched.stdCode && formik.errors.stdCode
+                        ? formik.errors.stdCode
                         : ""
                     }
                   />
                 </div>
-              </div>
-              <div className="mt-1">
-                <MyInput
-                  htmlFor="billingAddress"
-                  id="billingAddress"
-                  name="billingAddress"
-                  type="text"
-                  label="Billing Address"
-                  onChange={formik.handleChange}
-                  value={formik.values.billingAddress}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.billingAddress &&
-                    formik.errors.billingAddress
-                      ? formik.errors.billingAddress
-                      : ""
-                  }
-                />
+                <div className="mt-1">
+                  <MyInput
+                    htmlFor="landline"
+                    id="landline"
+                    name="landline"
+                    type="text"
+                    label="Landline"
+                    onChange={formik.handleChange}
+                    value={formik.values.landline}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.landline && formik.errors.landline
+                        ? formik.errors.landline
+                        : ""
+                    }
+                  />
+                </div>
               </div>
               <Button type="submit" className="bg-default text-white mt-4">
                 Save

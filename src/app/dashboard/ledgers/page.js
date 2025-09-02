@@ -2,7 +2,7 @@
 
 import { IconButton, TablePagination, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import CompanyModal from "@/components/modals/CompanyModal";
+import AddLedgerModal from "@/components/modals/AddLedgerModal";
 import { IoIosSearch } from "react-icons/io";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -15,11 +15,13 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
-import { DeleteCompany, GetCompanyList, UpdateUser } from "@/config/Api";
+import { DeleteLedger, GetLedgerList } from "@/config/Api";
 import { toast } from "react-toastify";
 import { GetActiveLabel } from "@/components/common/GlobalFunctions";
 import { debounce } from "lodash";
 import { MdMoreVert } from "react-icons/md";
+import { useSearchParams } from "next/navigation";
+import ContactListModal from "@/components/modals/contact/ContactListModal";
 
 const headCells = [
   {
@@ -33,29 +35,24 @@ const headCells = [
     numeric: false,
   },
   {
-    label: "FY's",
-    // align: "center",
-    numeric: false,
-  },
-  {
     label: "Email",
-    // align: "center",
+    //   align:"right",
     numeric: false,
   },
   {
-    label: "Pan",
-    // align: "center",
+    label: "GST",
+    //   align:"left",
     numeric: false,
   },
   {
-    label: "Gst",
-    // align: "center",
+    label: "PAN",
+    //   align:"left",
     numeric: false,
   },
   {
-    label: "Billing Address",
-    align: "left",
-    // numeric: false,
+    label: "Address",
+    //   align:"left",
+    numeric: false,
   },
   {
     label: "Action",
@@ -71,11 +68,14 @@ const Page = () => {
   const [formFor, setFormFor] = React.useState("Add");
   const [currentData, setCurrentData] = React.useState(null);
   const [isOpenAdd, setIsOpenAdd] = React.useState(false);
+  const [isOpenContact, setIsOpenContact] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [visibleRows, setVisibleRows] = useState([]);
   const [searchData, setSearchData] = useState("");
+  const searchPramas = useSearchParams();
+  const financialYear = searchPramas.get("financialYear");
 
   const onOpen = () => {
     setIsOpenAdd(true);
@@ -96,6 +96,15 @@ const Page = () => {
     setIsOpenAdd(false);
   };
 
+  const onOpenContact = (row) => {
+    setCurrentData(row);
+    setIsOpenContact(true);
+  };
+  const onCloseContact = () => {
+    setCurrentData(null);
+    setIsOpenContact(false);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -107,7 +116,7 @@ const Page = () => {
 
   const deleteData = async (id) => {
     const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await DeleteCompany(id)
+      await DeleteLedger(id)
         .then((res) => {
           if (res.data.success) {
             resolve(res.data.message);
@@ -144,51 +153,11 @@ const Page = () => {
     });
   };
 
-  const changeStatus = (id, status) => {
-    const resolveWithSomeData = new Promise(async (resolve, reject) => {
-      await UpdateUser(id, {
-        isActive: status,
-      })
-        .then((res) => {
-          if (res.data.success) {
-            resolve(res.data.message);
-            setLoaded(false);
-          } else {
-            reject(res.data.message);
-          }
-        })
-        .catch((err) => {
-          if (err.response?.data?.message) {
-            return reject(err.response?.data?.message);
-          }
-          reject(err.message);
-        });
-    });
-
-    toast.promise(resolveWithSomeData, {
-      pending: {
-        render() {
-          return "Saving...";
-        },
-      },
-      success: {
-        render({ data }) {
-          return `${data}`;
-        },
-      },
-      error: {
-        render({ data }) {
-          // When the promise reject, data will contains the error
-          return `${data}`;
-        },
-      },
-    });
-  };
-
   const getData = async (text) => {
     setError("");
     setLoading(true);
-    await GetCompanyList({
+    await GetLedgerList({
+      financialYear: financialYear,
       page: page + 1,
       pageSize: rowsPerPage,
       search: text ? text : searchData,
@@ -232,7 +201,7 @@ const Page = () => {
       <div className="w-full shadow-md">
         <div className=" px-4 py-4 flex items-center justify-between rounded-tl-lg rounded-tr-lg shadow-2xl bg-white">
           <h3 className="text-lg md:text-2xl font-semibold text-default ">
-            Companies
+            Ledgers
           </h3>
           <div className="flex items-center gap-1 md:gap-4">
             {/* <div className="bg-gray-100 rounded-full p-2 cursor-pointer"> */}
@@ -283,20 +252,22 @@ const Page = () => {
               {!loading &&
                 visibleRows.map((item, i) => (
                   <tr key={i}>
-                    <td align="left" className="whitespace-nowrap">{i + 1 + rowsPerPage * page}</td>
-                    <td align="left">{item?.companyName}</td>
                     <td align="left" className="whitespace-nowrap">
-                      {item?.financialYears?.[0].financialYear.split("-")?.[0]}-
-                      {
-                        item?.financialYears?.[
-                          item?.financialYears.length - 1
-                        ].financialYear.split("-")?.[1]
-                      }
+                      {i + 1 + rowsPerPage * page}
                     </td>
-                    <td align="left" className="whitespace-nowrap">{item?.email}</td>
-                    <td align="left" className="whitespace-nowrap">{item?.pan}</td>
-                    <td align="left" className="whitespace-nowrap">{item?.gst}</td>
-                    <td align="left">{item?.billingAddress}</td>
+                    <td align="left">{item?.companyName}</td>
+                    <td align="left">{item?.email}</td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.gst}
+                    </td>
+                    <td align="left" className="whitespace-nowrap">
+                      {item?.pan}
+                    </td>
+                    <td align="left">
+                      {item?.addressLine1} {item?.addressLine2}{" "}
+                      {item?.city?.name} {item?.state?.name}{" "}
+                      {item?.country?.name}
+                    </td>
                     <td align="center" className="whitespace-nowrap">
                       <Tooltip arrow title="Edit">
                         <IconButton
@@ -321,9 +292,9 @@ const Page = () => {
                           />
                         </IconButton>
                       </Tooltip>
-                      {/* <Dropdown>
+                      <Dropdown>
                         <DropdownTrigger>
-                          <Tooltip arrow title="Delete">
+                          <Tooltip arrow title="More">
                             <IconButton variant="bordered">
                               <MdMoreVert />
                             </IconButton>
@@ -338,13 +309,13 @@ const Page = () => {
                             // shortcut="⌘N"
                             // startContent={<AddNoteIcon className={iconClasses} />}
                             onClick={() => {
-                              onReset(item);
+                              onOpenContact(item);
                             }}
                           >
-                            Reset Password
+                            Contacts
                           </DropdownItem>
                         </DropdownMenu>
-                      </Dropdown> */}
+                      </Dropdown>
                     </td>
                   </tr>
                 ))}
@@ -384,12 +355,17 @@ const Page = () => {
           />
         </div>
       </div>
-      <CompanyModal
+      <AddLedgerModal
         formFor={formFor}
         currentData={currentData}
         isOpen={isOpenAdd}
         onClose={onClose}
         setLoaded={setLoaded}
+      />
+      <ContactListModal
+        currentData={currentData}
+        isOpen={isOpenContact}
+        onClose={onCloseContact}
       />
     </>
   );
